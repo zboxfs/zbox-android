@@ -1,0 +1,32 @@
+# Gradle build artifacts
+build
+
+# Gradle cache
+.gradle
+
+# Gradle local properties
+local.properties
+
+# Android Studio
+.idea
+*.iml
+
+# DS_Store
+.DS_Store
+*/.DS_Store
+
+# Build artifacts
+*.so
+*.d
+*.o
+
+# Backup files
+*.bak
+*~
+
+# Navigation Editor
+.navigation
+
+# Distribution files
+zbox*.jar
+zbox*.aar
