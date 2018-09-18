@@ -1,6 +1,6 @@
 package io.zbox;
 
-public final class Metadata {
+public class Metadata {
     public FileType fileType;
     public long len;
     public int currVersion;

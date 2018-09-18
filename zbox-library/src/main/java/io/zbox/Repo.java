@@ -2,6 +2,8 @@ package io.zbox;
 
 public class Repo extends RustObject {
 
+    private static int rustObjId = 101;
+
     private Repo() {}
 
     public static boolean exists(String uri) throws ZboxException {

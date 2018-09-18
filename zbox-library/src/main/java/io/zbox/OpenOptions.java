@@ -1,22 +1,10 @@
 package io.zbox;
 
-public final class OpenOptions {
-    private long rustObj = 0;
+public class OpenOptions extends RustObject {
 
-    public OpenOptions() {
-        this.jniSetRustObj();
-    }
+    private static int rustObjId = 102;
 
-    public void close() {
-        if (this.rustObj != 0) {
-            this.jniTakeRustObj();
-        }
-    }
-
-    @Override
-    public void finalize() {
-        this.close();
-    }
+    private OpenOptions() {}
 
     public void read(boolean read) {
         this.jniRead(read);
@@ -55,8 +43,7 @@ public final class OpenOptions {
         return file;
     }
 
-    private native void jniSetRustObj();
-    private native void jniTakeRustObj();
+    // jni methods
     private native void jniRead(boolean read);
     private native void jniWrite(boolean write);
     private native void jniAppend(boolean append);

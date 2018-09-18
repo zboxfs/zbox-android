@@ -2,19 +2,11 @@ package io.zbox;
 
 import java.nio.ByteBuffer;
 
-public final class VersionReader {
-    private long rustObj = 0;
+public class VersionReader extends RustObject {
 
-    public void close() {
-        if (this.rustObj != 0) {
-            this.jniTakeRustObj();
-        }
-    }
+    private static int rustObjId = 104;
 
-    @Override
-    public void finalize() {
-        this.close();
-    }
+    private VersionReader() { }
 
     public long read(ByteBuffer dst) throws ZboxException {
         return this.jniRead(dst);
@@ -24,7 +16,7 @@ public final class VersionReader {
         return this.jniSeek(offset, whence.getValue());
     }
 
-    private native void jniTakeRustObj();
+    // jni methods
     private native long jniRead(ByteBuffer dst);
     private native long jniSeek(long offset, int whence);
 }

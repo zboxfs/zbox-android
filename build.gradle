@@ -25,3 +25,22 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task buildZbox() {
+    group 'Zbox'
+    description 'Build Zbox'
+
+    /*exec {
+        executable 'sh'
+        args '-c', 'cd zbox && docker run --rm -v $PWD:/root/zbox zboxfs/android cargo build --target x86_64-linux-android'
+    }*/
+
+    doLast {
+        println 'Zbox build completed'
+    }
+}
+
+task copyJnilib(type: Copy) {
+    from file('zbox/target/x86_64-linux-android/debug/libzbox.so')
+    into file('zbox-library/src/zbox-library/src/main/jniLibs/x86_64')
+}

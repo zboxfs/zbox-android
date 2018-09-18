@@ -2,14 +2,14 @@ package io.zbox;
 
 abstract class RustObject implements AutoCloseable {
     // pointer to Rust object
-    protected long rustPtr = 0;
+    protected long rustObj = 0;
 
     public RustObject() {
         this.jniSetRustObj();
     }
 
     public void close() {
-        if (this.rustPtr != 0) {
+        if (this.rustObj != 0) {
             this.jniTakeRustObj();
         }
     }

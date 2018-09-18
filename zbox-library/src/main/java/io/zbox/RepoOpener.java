@@ -1,22 +1,10 @@
 package io.zbox;
 
-public final class RepoOpener {
-    private long rustObj = 0;
+public class RepoOpener extends RustObject {
 
-    public RepoOpener() {
-        this.jniSetRustObj();
-    }
+    private static int rustObjId = 100;
 
-    public void close() {
-        if (this.rustObj != 0) {
-            this.jniTakeRustObj();
-        }
-    }
-
-    @Override
-    public void finalize() {
-        this.close();
-    }
+    public RepoOpener() { }
 
     public void opsLimit(OpsLimit limit) {
         this.jniOpsLimit(limit.getValue());
@@ -59,8 +47,7 @@ public final class RepoOpener {
         return repo;
     }
 
-    private native void jniSetRustObj();
-    private native void jniTakeRustObj();
+    // jni methods
     private native void jniOpsLimit(int limit);
     private native void jniMemLimit(int limit);
     private native void jniCipher(int cipher);

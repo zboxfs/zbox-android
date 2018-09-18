@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 
 public class File extends RustObject {
 
+    private static int rustObjId = 103;
+
     private File() {}
 
     public Metadata metadata() throws ZboxException {

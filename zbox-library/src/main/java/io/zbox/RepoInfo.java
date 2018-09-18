@@ -1,6 +1,6 @@
 package io.zbox;
 
-public final class RepoInfo {
+public class RepoInfo {
     public byte[] volumeId;
     public String version;
     public String uri;
