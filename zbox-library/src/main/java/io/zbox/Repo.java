@@ -10,6 +10,8 @@ public class Repo extends RustObject {
         return jniExists(uri);
     }
 
+    public void close() { this.jniClose(); }
+
     public RepoInfo info() {
         return this.jniInfo();
     }
@@ -80,6 +82,7 @@ public class Repo extends RustObject {
 
     // jni methods
     private native static boolean jniExists(String uri);
+    private native void jniClose();
     private native RepoInfo jniInfo();
     private native void jniResetPassword(String oldPwd, String newPwd, int opsLimit, int memLimit);
     private native boolean jniPathExists(String path);
