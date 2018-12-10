@@ -1,4 +1,4 @@
-package io.zbox;
+package io.zbox.fs;
 
 public class DirEntry {
     public String path;

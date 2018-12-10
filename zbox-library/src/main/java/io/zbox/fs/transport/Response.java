@@ -1,4 +1,4 @@
-package io.zbox.transport;
+package io.zbox.fs.transport;
 
 // HTTP response wrapper
 public class Response {

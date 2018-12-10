@@ -1,4 +1,4 @@
-package io.zbox;
+package io.zbox.fs;
 
 import java.nio.ByteBuffer;
 
@@ -8,11 +8,11 @@ public class VersionReader extends RustObject {
 
     private VersionReader() { }
 
-    public long read(ByteBuffer dst) throws ZboxException {
+    public long read(ByteBuffer dst) {
         return this.jniRead(dst);
     }
 
-    public long seek(long offset, SeekFrom whence) throws ZboxException {
+    public long seek(long offset, SeekFrom whence) {
         return this.jniSeek(offset, whence.getValue());
     }
 

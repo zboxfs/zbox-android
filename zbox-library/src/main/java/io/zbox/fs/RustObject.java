@@ -1,4 +1,4 @@
-package io.zbox;
+package io.zbox.fs;
 
 abstract class RustObject implements AutoCloseable {
     // pointer to Rust object
@@ -11,6 +11,7 @@ abstract class RustObject implements AutoCloseable {
     public void close() {
         if (this.rustObj != 0) {
             this.jniTakeRustObj();
+            assert(rustObj == 0);
         }
     }
 

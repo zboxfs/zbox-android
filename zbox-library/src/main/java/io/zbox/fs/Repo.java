@@ -1,4 +1,4 @@
-package io.zbox;
+package io.zbox.fs;
 
 public class Repo extends RustObject {
 
@@ -6,17 +6,15 @@ public class Repo extends RustObject {
 
     private Repo() {}
 
-    public static boolean exists(String uri) throws ZboxException {
+    public static boolean exists(String uri) {
         return jniExists(uri);
     }
-
-    public void close() { this.jniClose(); }
 
     public RepoInfo info() {
         return this.jniInfo();
     }
 
-    public void resetPassword(String oldPwd, String newPwd, OpsLimit opsLimit, MemLimit memLimit) throws ZboxException {
+    public void resetPassword(String oldPwd, String newPwd, OpsLimit opsLimit, MemLimit memLimit) {
         this.jniResetPassword(oldPwd, newPwd, opsLimit.getValue(), memLimit.getValue());
     }
 
@@ -32,57 +30,56 @@ public class Repo extends RustObject {
         return this.jniIsDir(path);
     }
 
-    public File createFile(String path) throws ZboxException {
+    public File createFile(String path) {
         return this.jniCreateFile(path);
     }
 
-    public File openFile(String path) throws ZboxException {
+    public File openFile(String path) {
         return this.jniOpenFile(path);
     }
 
-    public void createDir(String path) throws ZboxException {
+    public void createDir(String path) {
         this.jniCreateDir(path);
     }
 
-    public void createDirAll(String path) throws ZboxException {
+    public void createDirAll(String path) {
         this.jniCreateDirAll(path);
     }
 
-    public DirEntry[] readDir(String path) throws ZboxException {
+    public DirEntry[] readDir(String path) {
         return this.jniReadDir(path);
     }
 
-    public Metadata metadata(String path) throws ZboxException {
+    public Metadata metadata(String path) {
         return this.jniMetadata(path);
     }
 
-    public Version[] history(String path) throws ZboxException {
+    public Version[] history(String path) {
         return this.jniHistory(path);
     }
 
-    public void copy(String from, String to) throws ZboxException {
+    public void copy(String from, String to) {
         this.jniCopy(from, to);
     }
 
-    public void removeFile(String path) throws ZboxException {
+    public void removeFile(String path) {
         this.jniRemoveFile(path);
     }
 
-    public void removeDir(String path) throws ZboxException {
+    public void removeDir(String path) {
         this.jniRemoveDir(path);
     }
 
-    public void removeDirAll(String path) throws ZboxException {
+    public void removeDirAll(String path) {
         this.jniRemoveDirAll(path);
     }
 
-    public void rename(String from, String to) throws ZboxException {
+    public void rename(String from, String to) {
         this.jniRename(from, to);
     }
 
     // jni methods
     private native static boolean jniExists(String uri);
-    private native void jniClose();
     private native RepoInfo jniInfo();
     private native void jniResetPassword(String oldPwd, String newPwd, int opsLimit, int memLimit);
     private native boolean jniPathExists(String path);

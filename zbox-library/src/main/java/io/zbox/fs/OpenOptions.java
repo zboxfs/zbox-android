@@ -1,4 +1,4 @@
-package io.zbox;
+package io.zbox.fs;
 
 public class OpenOptions extends RustObject {
 
@@ -38,7 +38,7 @@ public class OpenOptions extends RustObject {
         this.jniDedupChunk(dedup);
     }
 
-    public File open(Repo repo, String path) throws ZboxException {
+    public File open(Repo repo, String path) {
         File file = this.jniOpen(repo, path);
         return file;
     }

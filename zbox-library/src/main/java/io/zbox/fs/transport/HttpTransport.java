@@ -1,4 +1,4 @@
-package io.zbox.transport;
+package io.zbox.fs.transport;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 public class HttpTransport {
 

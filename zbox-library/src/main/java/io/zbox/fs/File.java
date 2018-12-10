@@ -1,4 +1,4 @@
-package io.zbox;
+package io.zbox.fs;
 
 import java.nio.ByteBuffer;
 
@@ -8,19 +8,19 @@ public class File extends RustObject {
 
     private File() {}
 
-    public Metadata metadata() throws ZboxException {
+    public Metadata metadata() {
         return this.jniMetadata();
     }
 
-    public Version[] history() throws ZboxException {
+    public Version[] history() {
         return this.jniHistory();
     }
 
-    public long currVersion() throws ZboxException {
+    public long currVersion() {
         return this.jniCurrVersion();
     }
 
-    public VersionReader versionReader(long verNum) throws ZboxException {
+    public VersionReader versionReader(long verNum) {
         return this.jniVersionReader(verNum);
     }
 

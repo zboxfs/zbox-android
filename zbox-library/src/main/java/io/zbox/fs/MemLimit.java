@@ -1,12 +1,12 @@
-package io.zbox;
+package io.zbox.fs;
 
-public enum OpsLimit {
+public enum MemLimit {
     INTERACTIVE(0),
     MODERATE(1),
     SENSITIVE(2);
 
     private final int id;
 
-    OpsLimit(int id) { this.id = id;  }
+    MemLimit(int id) { this.id = id;  }
     public int getValue() { return id;  }
 }
