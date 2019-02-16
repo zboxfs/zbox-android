@@ -2,7 +2,7 @@ package io.zbox.fs;
 
 public class Metadata {
     public FileType fileType;
-    public long len;
+    public long contentLen;
     public int currVersion;
     public long createdAt;
     public long modifiedAt;
