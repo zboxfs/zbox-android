@@ -18,6 +18,10 @@ public class Repo extends RustObject {
         this.jniResetPassword(oldPwd, newPwd, opsLimit.getValue(), memLimit.getValue());
     }
 
+    public void repairSuperBlock(String uri, String pwd) {
+        this.jniRepairSuperBlock(uri, pwd);
+    }
+
     public boolean pathExists(String path) {
         return this.jniPathExists(path);
     }
@@ -82,6 +86,7 @@ public class Repo extends RustObject {
     private native static boolean jniExists(String uri);
     private native RepoInfo jniInfo();
     private native void jniResetPassword(String oldPwd, String newPwd, int opsLimit, int memLimit);
+    private native void jniRepairSuperBlock(String uri, String pwd);
     private native boolean jniPathExists(String path);
     private native boolean jniIsFile(String path);
     private native boolean jniIsDir(String path);
