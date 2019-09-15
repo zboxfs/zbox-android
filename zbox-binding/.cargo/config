@@ -1,0 +1,15 @@
+[target.aarch64-linux-android]
+ar = "/opt/ndk/arm64/bin/aarch64-linux-android-ar"
+linker = "/opt/ndk/arm64/bin/aarch64-linux-android-clang"
+rustflags = [
+  "-L/opt/ndk/arm64/sysroot/usr/lib/aarch64-linux-android/21",
+  "-C", "link-arg=-Wl,--hash-style=both"
+]
+
+[target.x86_64-linux-android]
+ar = "/opt/ndk/x86_64/bin/x86_64-linux-android-ar"
+linker = "/opt/ndk/x86_64/bin/x86_64-linux-android-clang"
+rustflags = [
+  "-L/opt/ndk/x86_64/sysroot/usr/lib/x86_64-linux-android/21",
+  "-C", "link-arg=-Wl,--hash-style=both"
+]

@@ -5,6 +5,6 @@ public final class Env {
     public static native String version();
 
     static {
-        System.loadLibrary("zbox");
+        System.loadLibrary("zbox_android");
     }
 }

@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:3.5.0'
         
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -41,6 +41,6 @@ task buildZbox() {
 }
 
 task copyJnilib(type: Copy) {
-    from file('zbox/target/x86_64-linux-android/debug/libzbox.so')
+    from file('zbox-binding/target/x86_64-linux-android/debug/libzbox_android.so')
     into file('zbox-library/src/zbox-library/src/main/jniLibs/x86_64')
 }

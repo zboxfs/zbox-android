@@ -1,19 +1,19 @@
 #![allow(non_snake_case)]
 
-#[macro_use]
-extern crate lazy_static;
 extern crate jni;
+extern crate log;
+extern crate android_logger;
 extern crate zbox;
 
 use std::error::Error as StdError;
 use std::io::{Read, Seek, SeekFrom, Write};
-use std::ptr::NonNull;
-use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use jni::objects::{JByteBuffer, JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jint, jlong, jobjectArray, jstring, JNI_FALSE};
-use jni::{JNIEnv, JavaVM};
+use jni::{JNIEnv};
+use log::Level;
+use android_logger::Config;
 
 use zbox::{
     init_env, zbox_version, Cipher, File, MemLimit, Metadata, OpenOptions,
@@ -30,14 +30,6 @@ const RUST_OBJ_FIELD: &str = "rustObj";
 // 103 - File
 // 104 - VersionReader
 const RUST_OBJID_FIELD: &str = "rustObjId";
-
-lazy_static! {
-    // global JVM pointer
-    pub static ref JVM: Mutex<JavaVM> = unsafe {
-        let p = NonNull::dangling();
-        Mutex::new(JavaVM::from_raw(p.as_ptr()).unwrap())
-    };
-}
 
 #[inline]
 fn u8_to_bool(a: u8) -> bool {
@@ -64,7 +56,24 @@ fn check_version_limit(limit: jint) -> jint {
 
 #[inline]
 fn throw(env: &JNIEnv, err: &StdError) {
-    let _ = env.throw_new("io/zbox/fs/ZboxException", err.description());
+    if !env.exception_check().unwrap() {
+        let _ = env.throw_new("io/zbox/fs/ZboxException", err.description());
+        return;
+    }
+
+    // get java exception and re-throw it with its message
+    let exception = env.exception_occurred().unwrap();
+    env.exception_describe().unwrap();
+    env.exception_clear().unwrap();
+    let jval = env.call_method(
+        *exception,
+        "toString",
+        "()Ljava/lang/String;",
+        &[],
+    ).unwrap();
+    let msg = JString::from(jval.l().unwrap());
+    let msg: String = env.get_string(msg).unwrap().into();
+    let _ = env.throw_new("io/zbox/fs/ZboxException", msg);
 }
 
 #[no_mangle]
@@ -72,12 +81,13 @@ pub extern "system" fn Java_io_zbox_fs_Env_init(
     env: JNIEnv,
     _class: JClass,
 ) -> jint {
-    init_env();
+    android_logger::init_once(
+        Config::default()
+            .with_min_level(Level::Debug)
+            .with_tag("zboxfs")
+    );
 
-    // save global JVM pointer
-    let jvm = env.get_java_vm().unwrap();
-    let mut jvm_ptr = JVM.lock().unwrap();
-    *jvm_ptr = jvm;
+    init_env(env);
 
     0
 }
