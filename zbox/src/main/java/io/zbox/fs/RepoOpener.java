@@ -42,6 +42,24 @@ public class RepoOpener extends RustObject {
         this.jniReadOnly(readOnly);
     }
 
+    /**
+     * Allocates a new direct byte buffer.
+     *
+     * <p> The new buffer's position will be zero, its limit will be its
+     * capacity, its mark will be undefined, and each of its elements will be
+     * initialized to zero.  Whether or not it has a
+     * is unspecified.</p>
+     *
+     * @param  uri
+     *         The new buffer's capacity, in bytes
+     *
+     * @param  pwd
+     *         The password to encrypt repo
+     *
+     * @return  The opened repo instance
+     *
+     * @throws  ZboxException
+     */
     public Repo open(String uri, String pwd) throws ZboxException {
         Repo repo = this.jniOpen(uri, pwd);
         return repo;

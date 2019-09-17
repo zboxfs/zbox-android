@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class HttpTransport {
+class HttpTransport {
 
     private static final String LOG_TAG = HttpTransport.class.getName();
 
