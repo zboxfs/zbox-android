@@ -1,7 +1,7 @@
 FROM zboxfs/base
 
 RUN apt-get update && apt-get install -yq \
-    default-jdk \
+    python \
     unzip \
     zip
 
