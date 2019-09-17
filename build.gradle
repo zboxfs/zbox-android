@@ -1,15 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    
     repositories {
         google()
         jcenter()
+        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
         
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -19,28 +18,10 @@ allprojects {
     repositories {
         google()
         jcenter()
+        
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-task buildZbox() {
-    group 'Zbox'
-    description 'Build Zbox'
-
-    /*exec {
-        executable 'sh'
-        args '-c', 'cd zbox && docker run --rm -v $PWD:/root/zbox zboxfs/android cargo build --target x86_64-linux-android'
-    }*/
-
-    doLast {
-        println 'Zbox build completed'
-    }
-}
-
-task copyJnilib(type: Copy) {
-    from file('zbox-binding/target/x86_64-linux-android/debug/libzbox_android.so')
-    into file('zbox-library/src/zbox-library/src/main/jniLibs/x86_64')
 }
