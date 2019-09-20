@@ -1,45 +1,59 @@
 package io.zbox.fs;
 
+import androidx.annotation.NonNull;
+
 public class RepoOpener extends RustObject {
 
     private static int rustObjId = 100;
 
     public RepoOpener() { }
 
-    public void opsLimit(OpsLimit limit) {
-        this.jniOpsLimit(limit.getValue());
+    public RepoOpener opsLimit(@NonNull OpsLimit limit) {
+        OpsLimit lim = limit == null ? OpsLimit.INTERACTIVE : limit;
+        this.jniOpsLimit(lim.getValue());
+        return this;
     }
 
-    public void memLimit(MemLimit limit) {
-        this.jniMemLimit(limit.getValue());
+    public RepoOpener memLimit(@NonNull MemLimit limit) {
+        MemLimit lim = limit == null ? MemLimit.INTERACTIVE : limit;
+        this.jniMemLimit(lim.getValue());
+        return this;
     }
 
-    public void cipher(Cipher cipher) {
-        this.jniCipher(cipher.getValue());
+    public RepoOpener cipher(@NonNull Cipher cipher) {
+        Cipher ci = cipher == null ? Cipher.XCHACHA : cipher;
+        this.jniCipher(ci.getValue());
+        return this;
     }
 
-    public void create(boolean create) {
+    public RepoOpener create(boolean create) {
         this.jniCreate(create);
+        return this;
     }
 
-    public void createNew(boolean createNew) {
+    public RepoOpener createNew(boolean createNew) {
         this.jniCreateNew(createNew);
+        return this;
     }
 
-    public void compress(boolean compress) {
+    public RepoOpener compress(boolean compress) {
         this.jniCompress(compress);
+        return this;
     }
 
-    public void versionLimit(int limit) {
+    public RepoOpener versionLimit(int limit) {
         this.jniVersionLimit(limit);
+        return this;
     }
 
-    public void dedupChunk(boolean dedup) {
+    public RepoOpener dedupChunk(boolean dedup) {
         this.jniDedupChunk(dedup);
+        return this;
     }
 
-    public void readOnly(boolean readOnly) {
+    public RepoOpener readOnly(boolean readOnly) {
         this.jniReadOnly(readOnly);
+        return this;
     }
 
     /**
@@ -60,9 +74,9 @@ public class RepoOpener extends RustObject {
      *
      * @throws  ZboxException
      */
-    public Repo open(String uri, String pwd) throws ZboxException {
-        Repo repo = this.jniOpen(uri, pwd);
-        return repo;
+    public Repo open(@NonNull String uri, @NonNull String pwd) throws ZboxException {
+        checkNullParam2(uri, pwd);
+        return this.jniOpen(uri, pwd);
     }
 
     // jni methods

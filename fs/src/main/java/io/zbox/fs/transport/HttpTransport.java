@@ -1,5 +1,7 @@
 package io.zbox.fs.transport;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +28,7 @@ class HttpTransport {
         HttpTransport.timeout = timeout * 1000;
     }
 
-    private static void setHeaders(HttpsURLConnection conn, HashMap<String, String> headers) {
+    private static void setHeaders(@NonNull HttpsURLConnection conn, @NonNull HashMap<String, String> headers) {
         for(Map.Entry<String, String> ent : headers.entrySet()) {
             String key = ent.getKey();
             String value = ent.getValue();
@@ -34,7 +36,7 @@ class HttpTransport {
         }
     }
 
-    public static Response get(URL url, HashMap<String, String> headers) throws IOException {
+    public static Response get(@NonNull URL url, @NonNull HashMap<String, String> headers) throws IOException {
         HttpsURLConnection conn = null;
         Response ret = new Response();
 
@@ -88,7 +90,8 @@ class HttpTransport {
         return ret;
     }
 
-    public static Response put(URL url, HashMap<String, String> headers, byte[] body) throws IOException {
+    public static Response put(@NonNull URL url, @NonNull HashMap<String, String> headers,
+                               @NonNull byte[] body) throws IOException {
         HttpsURLConnection conn = null;
         Response ret = new Response();
 
@@ -122,7 +125,8 @@ class HttpTransport {
         return ret;
     }
 
-    public static Response delete(URL url, HashMap<String, String> headers) throws IOException {
+    public static Response delete(@NonNull URL url,
+                                  @NonNull HashMap<String, String> headers) throws IOException {
         HttpsURLConnection conn = null;
         Response ret = new Response();
 

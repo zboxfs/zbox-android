@@ -1,46 +1,56 @@
 package io.zbox.fs;
 
+import androidx.annotation.NonNull;
+
 public class OpenOptions extends RustObject {
 
     private static int rustObjId = 102;
 
-    private OpenOptions() {}
+    public OpenOptions() {}
 
-    public void read(boolean read) {
+    public OpenOptions read(boolean read) {
         this.jniRead(read);
+        return this;
     }
 
-    public void write(boolean write) {
+    public OpenOptions write(boolean write) {
         this.jniWrite(write);
+        return this;
     }
 
-    public void append(boolean append) {
+    public OpenOptions append(boolean append) {
         this.jniAppend(append);
+        return this;
     }
 
-    public void truncate(boolean truncate) {
+    public OpenOptions truncate(boolean truncate) {
         this.jniTruncate(truncate);
+        return this;
     }
 
-    public void create(boolean create) {
+    public OpenOptions create(boolean create) {
         this.jniCreate(create);
+        return this;
     }
 
-    public void createNew(boolean createNew) {
+    public OpenOptions createNew(boolean createNew) {
         this.jniCreateNew(createNew);
+        return this;
     }
 
-    public void versionLimit(int limit) {
+    public OpenOptions versionLimit(int limit) {
         this.jniVersionLimit(limit);
+        return this;
     }
 
-    public void dedupChunk(boolean dedup) {
+    public OpenOptions dedupChunk(boolean dedup) {
         this.jniDedupChunk(dedup);
+        return this;
     }
 
-    public File open(Repo repo, String path) {
-        File file = this.jniOpen(repo, path);
-        return file;
+    public File open(@NonNull Repo repo, @NonNull String path) throws ZboxException {
+        checkNullParam2(repo, path);
+        return this.jniOpen(repo, path);
     }
 
     // jni methods

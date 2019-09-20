@@ -1,19 +1,21 @@
 #![allow(non_snake_case)]
 
-extern crate jni;
-extern crate log;
 extern crate android_logger;
+extern crate jni;
+//#[macro_use]
+extern crate log;
 extern crate zbox;
 
 use std::error::Error as StdError;
 use std::io::{Read, Seek, SeekFrom, Write};
+use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use android_logger::Config;
 use jni::objects::{JByteBuffer, JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jint, jlong, jobjectArray, jstring, JNI_FALSE};
-use jni::{JNIEnv};
+use jni::JNIEnv;
 use log::Level;
-use android_logger::Config;
 
 use zbox::{
     init_env, zbox_version, Cipher, File, MemLimit, Metadata, OpenOptions,
@@ -54,7 +56,6 @@ fn check_version_limit(limit: jint) -> jint {
     }
 }
 
-#[inline]
 fn throw(env: &JNIEnv, err: &StdError) {
     if !env.exception_check().unwrap() {
         let _ = env.throw_new("io/zbox/fs/ZboxException", err.description());
@@ -65,30 +66,28 @@ fn throw(env: &JNIEnv, err: &StdError) {
     let exception = env.exception_occurred().unwrap();
     env.exception_describe().unwrap();
     env.exception_clear().unwrap();
-    let jval = env.call_method(
-        *exception,
-        "toString",
-        "()Ljava/lang/String;",
-        &[],
-    ).unwrap();
+    let jval = env
+        .call_method(*exception, "toString", "()Ljava/lang/String;", &[])
+        .unwrap();
     let msg = JString::from(jval.l().unwrap());
     let msg: String = env.get_string(msg).unwrap().into();
     let _ = env.throw_new("io/zbox/fs/ZboxException", msg);
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_zbox_fs_Env_init(
+pub extern "system" fn Java_io_zbox_fs_Env_initEnv(
     env: JNIEnv,
     _class: JClass,
+    level: JString,
 ) -> jint {
+    let lvl_str: String = env.get_string(level).unwrap().into();
+    let lvl = Level::from_str(&lvl_str).unwrap();
+
     android_logger::init_once(
-        Config::default()
-            .with_min_level(Level::Debug)
-            .with_tag("zboxfs")
+        Config::default().with_min_level(lvl).with_tag("zboxfs"),
     );
 
     init_env(env);
-
     0
 }
 
@@ -1146,6 +1145,21 @@ pub extern "system" fn Java_io_zbox_fs_File_jniRead(
             0
         }
     }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_zbox_fs_File_jniReadAll<'a>(
+    env: JNIEnv<'a>,
+    obj: JObject,
+) -> JByteBuffer<'a> {
+    let mut file = env
+        .get_rust_field::<&str, File>(obj, RUST_OBJ_FIELD)
+        .unwrap();
+    let mut dst = Vec::new();
+    if let Err(ref err) = file.read_to_end(&mut dst) {
+        throw(&env, err);
+    }
+    env.new_direct_byte_buffer(&mut dst).unwrap()
 }
 
 #[no_mangle]

@@ -1,2 +1,2 @@
-include ':zbox'
+include ':fs'
 rootProject.name='zbox-android'
