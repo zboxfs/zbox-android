@@ -8,8 +8,13 @@ public class File extends RustObject {
 
     private static int rustObjId = 103;
 
-    private int READ_BUF_CAP = 64 * 1024;
+    // read buffer
+    private int READ_BUF_CAP = 16 * 1024;
     private ByteBuffer readBuf = ByteBuffer.allocateDirect(READ_BUF_CAP);
+
+    // write buffer, lazily allocated
+    private int WRITE_BUF_CAP = 16 * 1024;
+    private ByteBuffer writeBuf = null;
 
     private File() {}
 
@@ -92,6 +97,28 @@ public class File extends RustObject {
         checkNullParam(buf);
         ByteBuffer src = this.ensureDirectBuf(buf);
         return this.jniWrite(src);
+    }
+
+    public int write(byte[] src, int off, int len) throws ZboxException {
+        ByteBuffer buf;
+
+        if (len > WRITE_BUF_CAP) {
+            buf = ByteBuffer.allocateDirect(len);
+        } else {
+            if (this.writeBuf == null) this.writeBuf = ByteBuffer.allocateDirect(WRITE_BUF_CAP);
+
+            buf = this.writeBuf.duplicate();
+            buf.clear();
+            buf.limit(len);
+            buf = buf.slice();
+        }
+
+        buf.put(src, off, len);
+        return (int)this.jniWrite(buf);
+    }
+
+    public int write(byte[] src) throws ZboxException {
+        return this.write(src, 0, src.length);
     }
 
     public long seek(long offset, @NonNull SeekFrom whence) throws ZboxException {

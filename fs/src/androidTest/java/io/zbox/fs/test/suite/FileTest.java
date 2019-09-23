@@ -9,13 +9,19 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 
 import io.zbox.fs.File;
+import io.zbox.fs.Metadata;
 import io.zbox.fs.OpenOptions;
 import io.zbox.fs.Repo;
 import io.zbox.fs.RepoOpener;
+import io.zbox.fs.SeekFrom;
+import io.zbox.fs.Version;
+import io.zbox.fs.VersionReader;
 import io.zbox.fs.ZboxException;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class FileTest {
@@ -101,8 +107,10 @@ public class FileTest {
     public void multipleWrite() throws ZboxException {
         String path = "/file03";
         File file = new OpenOptions().create(true).open(this.repo, path);
-        file.write(this.buf);
-        file.write(this.buf2);
+        long written = file.write(this.buf);
+        assertEquals(written, this.buf.position());
+        written = file.write(this.buf2);
+        assertEquals(written, this.buf2.position());
         file.finish();
         file.close();
 
@@ -168,8 +176,8 @@ public class FileTest {
         file.writeOnce(this.buf);
         file.close();
 
+        // single read all
         file = repo.openFile(path);
-
         byte[] dst = new byte[this.buf.capacity()];
         int read = file.read(dst);
         assertEquals(read, this.buf.position());
@@ -177,7 +185,225 @@ public class FileTest {
         ByteBuffer buf = this.buf.asReadOnlyBuffer();
         buf.flip();
         buf.get(bytes,0, read);
-        assertArrayEquals(bytes, dst);
+        assertArrayEquals(dst, bytes);
+        file.close();
+
+        // multiple read, #1
+        file = repo.openFile(path);
+        dst = new byte[2];
+        read = file.read(dst);
+        assertEquals(read, dst.length);
+        bytes = new byte[dst.length];
+        buf = this.buf.asReadOnlyBuffer();
+        buf.flip();
+        buf.get(bytes,0, read);
+        assertArrayEquals(dst, bytes);
+
+        // multiple read, #2
+        int left = this.buf.position() - read;
+        read = file.read(dst);
+        assertEquals(read, left);
+        buf.get(bytes,0, read);
+        assertArrayEquals(dst, bytes);
+        file.close();
+
+        // read from offset
+        file = repo.openFile(path);
+        dst = new byte[3];
+        read = file.read(dst, 1,2);
+        assertEquals(read, 2);
+        bytes = new byte[dst.length];
+        buf = this.buf.asReadOnlyBuffer();
+        buf.flip();
+        buf.get(bytes,1, read);
+        assertArrayEquals(dst, bytes);
+        file.close();
+
+        // test file seek
+        file = repo.openFile(path);
+        long sought = file.seek(1, SeekFrom.START);
+        assertEquals(sought, 1);
+        dst = new byte[2];
+        file.read(dst);
+        buf = this.buf.asReadOnlyBuffer();
+        buf.rewind();
+        buf.get();
+        assertEquals(dst[0], buf.get());
+        assertEquals(dst[1], buf.get());
+        file.close();
+    }
+
+    @Test
+    public void byteArrayWrite() throws ZboxException {
+        String path = "/file07";
+        File file = new OpenOptions().create(true).open(this.repo, path);
+
+        // write to file with whole byte array
+        byte[] src = new byte[this.buf.position()];
+        ByteBuffer buf = this.buf.asReadOnlyBuffer();
+        buf.flip();
+        buf.get(src);
+        int written = file.write(src);
+        file.finish();
+        file.close();
+        assertEquals(written, this.buf.position());
+
+        // verify file content
+        file = repo.openFile(path);
+        ByteBuffer dst = file.readAll();
+        assertBufEquals(dst, this.buf);
+        file.close();
+
+        // write to file with partial byte array
+        path = "/file07-1";
+        file = new OpenOptions().create(true).open(this.repo, path);
+        written = file.write(src, 1, 2);
+        file.finish();
+        file.close();
+        assertEquals(written, 2);
+
+        // verify file content
+        file = repo.openFile(path);
+        dst = file.readAll();
+        dst.rewind();
+        buf = this.buf.asReadOnlyBuffer();
+        buf.flip();
+        buf.position(1);
+        buf = buf.slice();
+        assertBufEquals(dst, buf);
+    }
+
+    @Test
+    public void metadata() throws ZboxException {
+        String path = "/file08";
+        File file = new OpenOptions().create(true).open(this.repo, path);
+        file.writeOnce(this.buf);
+        file.close();
+
+        file = repo.openFile(path);
+        Metadata md = file.metadata();
+        assertNotNull(md);
+        assertTrue(md.isFile());
+        assertFalse(md.isDir());
+        assertEquals(md.contentLen, this.buf.position());
+        file.close();
+    }
+
+    @Test
+    public void versioning() throws ZboxException {
+        String path = "/file09";
+        File file = new OpenOptions().create(true).versionLimit(2).open(this.repo, path);
+
+        // write version #1
+        file.writeOnce(this.buf);
+        file.close();
+
+        // write version #2
+        file = new OpenOptions().write(true).open(this.repo, path);
+        file.writeOnce(this.buf2);
+        file.close();
+
+        file = repo.openFile(path);
+        long ver = file.currVersion();
+        assertEquals(ver, 3);
+        Version[] hist = file.history();
+        assertEquals(hist.length, 2);
+        assertEquals(hist[0].num, 2);
+        assertEquals(hist[0].contentLen, this.buf.position());
+        assertEquals(hist[1].num, 3);
+        assertEquals(hist[1].contentLen, this.buf2.position());
+
+        // test version reader #1
+        VersionReader vr = file.versionReader(2);
+        ByteBuffer buf = vr.readAll();
+        assertBufEquals(buf, this.buf);
+        vr.close();
+
+        // test version reader seek
+        vr = file.versionReader(2);
+        long sought = vr.seek(1, SeekFrom.START);
+        assertEquals(sought, 1);
+        buf = vr.readAll();
+        ByteBuffer dst = this.buf.asReadOnlyBuffer();
+        dst.flip();
+        dst.position(1);
+        dst = dst.slice();
+        dst.position(2);
+        assertBufEquals(dst, buf);
+        vr.close();
+
+        // test version reader #2
+        vr = file.versionReader(3);
+        dst = ByteBuffer.allocateDirect(this.buf2.position());
+        long read = vr.read(dst);
+        assertEquals(read, this.buf2.position());
+        assertBufEquals(dst, this.buf2);
+        vr.close();
+
+        // test version reader read to byte array
+        vr = file.versionReader(3);
+        byte[] dst2 = new byte[3];
+        read = (long)vr.read(dst2);
+        assertEquals(read, dst2.length);
+        buf = this.buf2.asReadOnlyBuffer();
+        buf.rewind();
+        assertEquals(dst2[0], buf.get());
+        assertEquals(dst2[1], buf.get());
+        assertEquals(dst2[2], buf.get());
+        vr.close();
+
+        // test version reader read to byte array partially
+        vr = file.versionReader(3);
+        byte[] dst3 = new byte[3];
+        read = (long)vr.read(dst3, 1, 2);
+        assertEquals(read, dst3.length - 1);
+        buf = this.buf2.asReadOnlyBuffer();
+        buf.rewind();
+        assertEquals(dst3[1], buf.get());
+        assertEquals(dst3[2], buf.get());
+        vr.close();
+
+        file.close();
+    }
+
+    @Test
+    public void setNewLen() throws ZboxException {
+        String path = "/file10";
+        File file = new OpenOptions().create(true).open(this.repo, path);
+        file.writeOnce(this.buf);
+        file.close();
+
+        // case #1: extend file
+        file = new OpenOptions().write(true).open(this.repo, path);
+        file.setLen(this.buf.position() + 2);
+        file.close();
+
+        // verify file content
+        file = repo.openFile(path);
+        ByteBuffer dst = file.readAll();
+        ByteBuffer src = ByteBuffer.allocate(this.buf.position() + 2);
+        ByteBuffer buf = this.buf.asReadOnlyBuffer();
+        buf.flip();
+        src.put(buf);
+        src.put((byte)0);
+        src.put((byte)0);
+        assertBufEquals(dst, src);
+        file.close();
+
+        // case #2: truncate file
+        file = new OpenOptions().write(true).open(this.repo, path);
+        file.setLen(this.buf.position() - 2);
+        file.close();
+
+        // verify file content
+        file = repo.openFile(path);
+        dst = file.readAll();
+        assertEquals(dst.position(), 1);
+        buf = this.buf.asReadOnlyBuffer();
+        buf.rewind();
+        dst.rewind();
+        assertEquals(dst.get(), buf.get());
+        file.close();
     }
 
     @After

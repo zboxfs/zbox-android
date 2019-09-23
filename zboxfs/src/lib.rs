@@ -1231,6 +1231,21 @@ pub extern "system" fn Java_io_zbox_fs_VersionReader_jniRead(
 }
 
 #[no_mangle]
+pub extern "system" fn Java_io_zbox_fs_VersionReader_jniReadAll<'a>(
+    env: JNIEnv<'a>,
+    obj: JObject,
+) -> JByteBuffer<'a> {
+    let mut rdr = env
+        .get_rust_field::<&str, VersionReader>(obj, RUST_OBJ_FIELD)
+        .unwrap();
+    let mut dst = Vec::new();
+    if let Err(ref err) = rdr.read_to_end(&mut dst) {
+        throw(&env, err);
+    }
+    env.new_direct_byte_buffer(&mut dst).unwrap()
+}
+
+#[no_mangle]
 pub extern "system" fn Java_io_zbox_fs_VersionReader_jniSeek(
     env: JNIEnv,
     obj: JObject,
