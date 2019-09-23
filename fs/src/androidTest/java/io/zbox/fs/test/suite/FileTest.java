@@ -28,7 +28,6 @@ public class FileTest {
 
     private static final String TAG = "FileTest";
 
-    private String uri;
     private Repo repo;
     private ByteBuffer buf, buf2, dst;
 
@@ -42,8 +41,8 @@ public class FileTest {
 
     @Before
     public void before() throws ZboxException {
-        this.uri = "file://" + TestSuite.testDir + "/" + TestSuite.randomString();
-        this.repo = new RepoOpener().create(true).open(this.uri, "pwd");
+        String uri = "file://" + TestSuite.testDir + "/" + TestSuite.randomString();
+        this.repo = new RepoOpener().create(true).open(uri, "pwd");
 
         this.buf = ByteBuffer.allocateDirect(20);
         buf.put((byte)1);
@@ -286,6 +285,9 @@ public class FileTest {
         assertTrue(md.isFile());
         assertFalse(md.isDir());
         assertEquals(md.contentLen, this.buf.position());
+        assertEquals(md.currVersion, 2);
+        assertTrue(md.createdAt > 0);
+        assertTrue(md.modifiedAt > 0);
         file.close();
     }
 

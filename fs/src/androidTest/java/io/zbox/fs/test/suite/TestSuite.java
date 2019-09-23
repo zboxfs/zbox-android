@@ -15,7 +15,7 @@ import java.security.SecureRandom;
 import io.zbox.fs.Env;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ RepoTest.class, PersistTest.class, FileTest.class })
+@Suite.SuiteClasses({ RepoTest.class, PersistTest.class, FileTest.class, DirTest.class })
 public class TestSuite {
     private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
     private static final String CHAR_UPPER = CHAR_LOWER.toUpperCase();

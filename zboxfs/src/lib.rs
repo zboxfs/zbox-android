@@ -286,8 +286,9 @@ pub extern "system" fn Java_io_zbox_fs_RepoOpener_jniOpen<'a>(
             repo_obj
         }
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
@@ -302,8 +303,9 @@ pub extern "system" fn Java_io_zbox_fs_Repo_jniExists(
     match Repo::exists(&uri) {
         Ok(ret) => ret as u8,
         Err(ref err) => {
+            let ret = JNI_FALSE;
             throw(&env, err);
-            JNI_FALSE
+            ret
         }
     }
 }
@@ -319,8 +321,9 @@ pub extern "system" fn Java_io_zbox_fs_Repo_jniInfo<'a>(
 
     let info = repo.info();
     if let Err(ref err) = info {
+        let ret = JObject::null();
         throw(&env, err);
-        return JObject::null();
+        return ret;
     }
     let info = info.unwrap();
 
@@ -545,8 +548,9 @@ pub extern "system" fn Java_io_zbox_fs_Repo_jniCreateFile<'a>(
             file_obj
         }
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
@@ -569,8 +573,9 @@ pub extern "system" fn Java_io_zbox_fs_Repo_jniOpenFile<'a>(
             file_obj
         }
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
@@ -718,9 +723,10 @@ pub extern "system" fn Java_io_zbox_fs_Repo_jniReadDir(
             objs
         }
         Err(ref err) => {
+            let ret = env.new_object_array(0, "io/zbox/fs/DirEntry", JObject::null())
+                .unwrap();
             throw(&env, err);
-            env.new_object_array(0, "io/zbox/fs/DirEntry", JObject::null())
-                .unwrap()
+            ret
         }
     }
 }
@@ -738,8 +744,9 @@ pub extern "system" fn Java_io_zbox_fs_Repo_jniMetadata<'a>(
     match repo.metadata(&path) {
         Ok(meta) => metadata_to_jobject(&env, meta),
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
@@ -793,9 +800,10 @@ fn versions_to_jobjects(
             objs
         }
         Err(ref err) => {
+            let ret = env.new_object_array(0, "io/zbox/fs/Version", JObject::null())
+                .unwrap();
             throw(&env, err);
-            env.new_object_array(0, "io/zbox/fs/Version", JObject::null())
-                .unwrap()
+            ret
         }
     }
 }
@@ -1011,8 +1019,9 @@ pub extern "system" fn Java_io_zbox_fs_OpenOptions_jniOpen<'a>(
             file_obj
         }
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
@@ -1028,8 +1037,9 @@ pub extern "system" fn Java_io_zbox_fs_File_jniMetadata<'a>(
     match file.metadata() {
         Ok(meta) => metadata_to_jobject(&env, meta),
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
@@ -1080,8 +1090,9 @@ pub extern "system" fn Java_io_zbox_fs_File_jniVersionReader<'a>(
             rdr_obj
         }
         Err(ref err) => {
+            let ret = JObject::null();
             throw(&env, err);
-            JObject::null()
+            ret
         }
     }
 }
