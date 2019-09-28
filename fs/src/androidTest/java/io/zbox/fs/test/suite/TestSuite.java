@@ -58,6 +58,14 @@ public class TestSuite {
         return sb.toString();
     }
 
+    public static String makeFileRepoUri() {
+         return "file://" + testDir + "/" + randomString();
+    }
+
+    public static String makeMemRepoUri() {
+        return "mem://" + randomString();
+    }
+
     private static void deleteDirRecursively(File dir) {
         if (dir.isDirectory()) {
             for (File child : dir.listFiles()) {

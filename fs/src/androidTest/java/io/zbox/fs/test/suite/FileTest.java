@@ -41,7 +41,7 @@ public class FileTest {
 
     @Before
     public void before() throws ZboxException {
-        String uri = "file://" + TestSuite.testDir + "/" + TestSuite.randomString();
+        String uri = TestSuite.makeFileRepoUri();
         this.repo = new RepoOpener().create(true).open(uri, "pwd");
 
         this.buf = ByteBuffer.allocateDirect(20);

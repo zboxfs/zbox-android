@@ -12,20 +12,21 @@ public class VersionReader extends RustObject {
     private int READ_BUF_CAP = 16 * 1024;
     private ByteBuffer readBuf = ByteBuffer.allocateDirect(READ_BUF_CAP);
 
-    private VersionReader() { }
+    private VersionReader() {
+    }
 
     public long read(@NonNull ByteBuffer dst) throws ZboxException {
         checkNullParam(dst);
 
         if (dst.isDirect()) {
             long ret = this.jniRead(dst.slice());
-            dst.position(dst.position() + (int)ret);
+            dst.position(dst.position() + (int) ret);
             return ret;
         }
 
         ByteBuffer cloned = ByteBuffer.allocateDirect(dst.remaining());
         long ret = this.jniRead(cloned);
-        cloned.limit((int)ret);
+        cloned.limit((int) ret);
         dst.put(cloned);
         return ret;
     }
@@ -42,7 +43,7 @@ public class VersionReader extends RustObject {
             buf = buf.slice();
         }
 
-        int ret = (int)this.jniRead(buf);
+        int ret = (int) this.jniRead(buf);
         buf.limit(ret);
         buf.get(dst, off, len > ret ? ret : len);
 
@@ -66,7 +67,9 @@ public class VersionReader extends RustObject {
 
     // jni methods
     private native long jniRead(ByteBuffer dst);
+
     private native ByteBuffer jniReadAll();
+
     private native long jniSeek(long offset, int whence);
 }
 

@@ -6,7 +6,8 @@ public class Repo extends RustObject {
 
     private static int rustObjId = 101;
 
-    private Repo() {}
+    private Repo() {
+    }
 
     public static boolean exists(@NonNull String uri) throws ZboxException {
         checkNullParam(uri);
@@ -24,9 +25,9 @@ public class Repo extends RustObject {
         this.jniResetPassword(oldPwd, newPwd, opsLimit.getValue(), memLimit.getValue());
     }
 
-    public void repairSuperBlock(@NonNull String uri, @NonNull String pwd) throws ZboxException {
+    public static void repairSuperBlock(@NonNull String uri, @NonNull String pwd) throws ZboxException {
         checkNullParam2(uri, pwd);
-        this.jniRepairSuperBlock(uri, pwd);
+        jniRepairSuperBlock(uri, pwd);
     }
 
     public boolean pathExists(@NonNull String path) throws ZboxException {
@@ -106,22 +107,40 @@ public class Repo extends RustObject {
 
     // jni methods
     private native static boolean jniExists(String uri);
+
     private native RepoInfo jniInfo();
+
     private native void jniResetPassword(String oldPwd, String newPwd, int opsLimit, int memLimit);
-    private native void jniRepairSuperBlock(String uri, String pwd);
+
+    private static native void jniRepairSuperBlock(String uri, String pwd);
+
     private native boolean jniPathExists(String path);
+
     private native boolean jniIsFile(String path);
+
     private native boolean jniIsDir(String path);
+
     private native File jniCreateFile(String path);
+
     private native File jniOpenFile(String path);
+
     private native void jniCreateDir(String path);
+
     private native void jniCreateDirAll(String path);
+
     private native DirEntry[] jniReadDir(String path);
+
     private native Metadata jniMetadata(String path);
+
     private native Version[] jniHistory(String path);
+
     private native void jniCopy(String from, String to);
+
     private native void jniRemoveFile(String path);
+
     private native void jniRemoveDir(String path);
+
     private native void jniRemoveDirAll(String path);
+
     private native void jniRename(String from, String to);
 }

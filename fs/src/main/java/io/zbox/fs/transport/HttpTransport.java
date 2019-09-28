@@ -22,14 +22,15 @@ class HttpTransport {
     // bytes transfer buffer for JNI
     private static byte[] transBuf = new byte[128 * 1024];
 
-    private HttpTransport() {}
+    private HttpTransport() {
+    }
 
     public static void init(int timeout) {
         HttpTransport.timeout = timeout * 1000;
     }
 
     private static void setHeaders(@NonNull HttpsURLConnection conn, @NonNull HashMap<String, String> headers) {
-        for(Map.Entry<String, String> ent : headers.entrySet()) {
+        for (Map.Entry<String, String> ent : headers.entrySet()) {
             String key = ent.getKey();
             String value = ent.getValue();
             conn.setRequestProperty(key, value);

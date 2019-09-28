@@ -7,6 +7,11 @@ public enum OpsLimit {
 
     private final int id;
 
-    OpsLimit(int id) { this.id = id;  }
-    public int getValue() { return id;  }
+    OpsLimit(int id) {
+        this.id = id;
+    }
+
+    public int getValue() {
+        return id;
+    }
 }

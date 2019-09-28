@@ -21,7 +21,7 @@ public class PersistTest {
 
     @Before
     public void before() throws ZboxException {
-        this.uri = "file://" + TestSuite.testDir + "/" + TestSuite.randomString();
+        this.uri = TestSuite.makeFileRepoUri();
         this.repo = new RepoOpener().create(true).open(this.uri, "pwd");
         repo.close();
     }

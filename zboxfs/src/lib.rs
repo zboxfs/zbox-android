@@ -267,6 +267,18 @@ pub extern "system" fn Java_io_zbox_fs_RepoOpener_jniReadOnly(
 }
 
 #[no_mangle]
+pub extern "system" fn Java_io_zbox_fs_RepoOpener_jniForce(
+    env: JNIEnv,
+    obj: JObject,
+    force: jboolean,
+) {
+    let mut opener = env
+        .get_rust_field::<&str, RepoOpener>(obj, RUST_OBJ_FIELD)
+        .unwrap();
+    opener.force(u8_to_bool(force));
+}
+
+#[no_mangle]
 pub extern "system" fn Java_io_zbox_fs_RepoOpener_jniOpen<'a>(
     env: JNIEnv<'a>,
     obj: JObject,

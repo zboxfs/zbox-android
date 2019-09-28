@@ -7,6 +7,11 @@ public enum SeekFrom {
 
     private final int id;
 
-    SeekFrom(int id) { this.id = id;  }
-    public int getValue() { return id;  }
+    SeekFrom(int id) {
+        this.id = id;
+    }
+
+    public int getValue() {
+        return id;
+    }
 }

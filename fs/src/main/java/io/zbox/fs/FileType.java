@@ -6,7 +6,12 @@ public enum FileType {
 
     private final int id;
 
-    FileType(int id) { this.id = id;  }
-    public int getValue() { return id;  }
+    FileType(int id) {
+        this.id = id;
+    }
+
+    public int getValue() {
+        return id;
+    }
 }
 

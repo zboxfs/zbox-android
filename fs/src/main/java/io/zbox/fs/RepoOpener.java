@@ -6,7 +6,8 @@ public class RepoOpener extends RustObject {
 
     private static int rustObjId = 100;
 
-    public RepoOpener() { }
+    public RepoOpener() {
+    }
 
     public RepoOpener opsLimit(@NonNull OpsLimit limit) {
         OpsLimit lim = limit == null ? OpsLimit.INTERACTIVE : limit;
@@ -56,6 +57,11 @@ public class RepoOpener extends RustObject {
         return this;
     }
 
+    public RepoOpener force(boolean force) {
+        this.jniForce(force);
+        return this;
+    }
+
     /**
      * Allocates a new direct byte buffer.
      *
@@ -64,15 +70,10 @@ public class RepoOpener extends RustObject {
      * initialized to zero.  Whether or not it has a
      * is unspecified.</p>
      *
-     * @param  uri
-     *         The new buffer's capacity, in bytes
-     *
-     * @param  pwd
-     *         The password to encrypt repo
-     *
-     * @return  The opened repo instance
-     *
-     * @throws  ZboxException
+     * @param uri The new buffer's capacity, in bytes
+     * @param pwd The password to encrypt repo
+     * @return The opened repo instance
+     * @throws ZboxException
      */
     public Repo open(@NonNull String uri, @NonNull String pwd) throws ZboxException {
         checkNullParam2(uri, pwd);
@@ -81,14 +82,25 @@ public class RepoOpener extends RustObject {
 
     // jni methods
     private native void jniOpsLimit(int limit);
+
     private native void jniMemLimit(int limit);
+
     private native void jniCipher(int cipher);
+
     private native void jniCreate(boolean create);
+
     private native void jniCreateNew(boolean createNew);
+
     private native void jniCompress(boolean compress);
+
     private native void jniVersionLimit(int limit);
+
     private native void jniDedupChunk(boolean dedup);
+
     private native void jniReadOnly(boolean readOnly);
+
+    private native void jniForce(boolean force);
+
     private native Repo jniOpen(String uri, String pwd);
 }
 

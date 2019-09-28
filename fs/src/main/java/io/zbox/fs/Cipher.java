@@ -6,7 +6,12 @@ public enum Cipher {
 
     private final int id;
 
-    Cipher(int id) { this.id = id;  }
-    public int getValue() { return id;  }
+    Cipher(int id) {
+        this.id = id;
+    }
+
+    public int getValue() {
+        return id;
+    }
 }
 

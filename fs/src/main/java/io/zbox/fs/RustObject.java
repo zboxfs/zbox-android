@@ -25,15 +25,15 @@ abstract class RustObject implements AutoCloseable {
         super.finalize();
     }
 
-    protected static void checkNullParam(Object param) throws ZboxException {
+    static void checkNullParam(Object param) throws ZboxException {
         if (param == null) throw new ZboxException("Invalid null parameter");
     }
 
-    protected static void checkNullParam2(Object param, Object param2) throws ZboxException {
+    static void checkNullParam2(Object param, Object param2) throws ZboxException {
         if (param == null || param2 == null) throw new ZboxException("Invalid null parameter");
     }
 
-    protected ByteBuffer ensureDirectBuf(ByteBuffer buf) {
+    ByteBuffer ensureDirectBuf(ByteBuffer buf) {
         ByteBuffer src = buf.asReadOnlyBuffer();
         src.flip();
 
@@ -48,5 +48,6 @@ abstract class RustObject implements AutoCloseable {
 
     // jni methods
     private native void jniSetRustObj();
+
     private native void jniTakeRustObj();
 }

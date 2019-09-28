@@ -7,6 +7,11 @@ public enum MemLimit {
 
     private final int id;
 
-    MemLimit(int id) { this.id = id;  }
-    public int getValue() { return id;  }
+    MemLimit(int id) {
+        this.id = id;
+    }
+
+    public int getValue() {
+        return id;
+    }
 }

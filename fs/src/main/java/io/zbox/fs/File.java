@@ -16,7 +16,8 @@ public class File extends RustObject {
     private int WRITE_BUF_CAP = 16 * 1024;
     private ByteBuffer writeBuf = null;
 
-    private File() {}
+    private File() {
+    }
 
     public Metadata metadata() {
         return this.jniMetadata();
@@ -53,13 +54,13 @@ public class File extends RustObject {
 
         if (dst.isDirect()) {
             long ret = this.jniRead(dst.slice());
-            dst.position(dst.position() + (int)ret);
+            dst.position(dst.position() + (int) ret);
             return ret;
         }
 
         ByteBuffer cloned = ByteBuffer.allocateDirect(dst.remaining());
         long ret = this.jniRead(cloned);
-        cloned.limit((int)ret);
+        cloned.limit((int) ret);
         dst.put(cloned);
         return ret;
     }
@@ -76,7 +77,7 @@ public class File extends RustObject {
             buf = buf.slice();
         }
 
-        int ret = (int)this.jniRead(buf);
+        int ret = (int) this.jniRead(buf);
         buf.limit(ret);
         buf.get(dst, off, len > ret ? ret : len);
 
@@ -114,7 +115,7 @@ public class File extends RustObject {
         }
 
         buf.put(src, off, len);
-        return (int)this.jniWrite(buf);
+        return (int) this.jniWrite(buf);
     }
 
     public int write(byte[] src) throws ZboxException {
@@ -128,14 +129,24 @@ public class File extends RustObject {
 
     // jni methods
     private native Metadata jniMetadata();
+
     private native Version[] jniHistory();
+
     private native long jniCurrVersion();
+
     private native VersionReader jniVersionReader(long verNum);
+
     private native void jniFinish();
+
     private native void jniWriteOnce(ByteBuffer buf);
+
     private native void jniSetLen(long len);
+
     private native long jniRead(ByteBuffer dst);
+
     private native ByteBuffer jniReadAll();
+
     private native long jniWrite(ByteBuffer buf);
+
     private native long jniSeek(long offset, int whence);
 }

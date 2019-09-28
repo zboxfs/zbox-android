@@ -6,7 +6,8 @@ public class OpenOptions extends RustObject {
 
     private static int rustObjId = 102;
 
-    public OpenOptions() {}
+    public OpenOptions() {
+    }
 
     public OpenOptions read(boolean read) {
         this.jniRead(read);
@@ -55,12 +56,20 @@ public class OpenOptions extends RustObject {
 
     // jni methods
     private native void jniRead(boolean read);
+
     private native void jniWrite(boolean write);
+
     private native void jniAppend(boolean append);
+
     private native void jniTruncate(boolean truncate);
+
     private native void jniCreate(boolean create);
+
     private native void jniCreateNew(boolean createNew);
+
     private native void jniVersionLimit(int limit);
+
     private native void jniDedupChunk(boolean dedup);
+
     private native File jniOpen(Repo repo, String path);
 }
