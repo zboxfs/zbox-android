@@ -2,6 +2,9 @@ package io.zbox.fs;
 
 import androidx.annotation.NonNull;
 
+/**
+ * A builder used to create a repository {@link io.zbox.fs.Repo} in various manners.
+ */
 public class RepoOpener extends RustObject {
 
     private static int rustObjId = 100;
@@ -9,19 +12,19 @@ public class RepoOpener extends RustObject {
     public RepoOpener() {
     }
 
-    public RepoOpener opsLimit(@NonNull OpsLimit limit) {
+    public RepoOpener opsLimit(OpsLimit limit) {
         OpsLimit lim = limit == null ? OpsLimit.INTERACTIVE : limit;
         this.jniOpsLimit(lim.getValue());
         return this;
     }
 
-    public RepoOpener memLimit(@NonNull MemLimit limit) {
+    public RepoOpener memLimit(MemLimit limit) {
         MemLimit lim = limit == null ? MemLimit.INTERACTIVE : limit;
         this.jniMemLimit(lim.getValue());
         return this;
     }
 
-    public RepoOpener cipher(@NonNull Cipher cipher) {
+    public RepoOpener cipher(Cipher cipher) {
         Cipher ci = cipher == null ? Cipher.XCHACHA : cipher;
         this.jniCipher(ci.getValue());
         return this;
@@ -75,7 +78,7 @@ public class RepoOpener extends RustObject {
      * @return The opened repo instance
      * @throws ZboxException
      */
-    public Repo open(@NonNull String uri, @NonNull String pwd) throws ZboxException {
+    public Repo open(String uri, String pwd) throws ZboxException {
         checkNullParam2(uri, pwd);
         return this.jniOpen(uri, pwd);
     }

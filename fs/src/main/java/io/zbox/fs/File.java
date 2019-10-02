@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 
 import java.nio.ByteBuffer;
 
+/**
+ * A reference to an opened file in the repository.
+ */
 public class File extends RustObject {
 
     private static int rustObjId = 103;

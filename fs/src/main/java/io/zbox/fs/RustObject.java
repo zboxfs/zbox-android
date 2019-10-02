@@ -10,6 +10,9 @@ abstract class RustObject implements AutoCloseable {
         this.jniSetRustObj();
     }
 
+    /**
+     * Closes this instance and releases any resources associated with this instance.
+     */
     public void close() {
         if (this.rustObj != 0) {
             this.jniTakeRustObj();

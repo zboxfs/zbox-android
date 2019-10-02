@@ -24,7 +24,7 @@ public class TestSuite {
     private static SecureRandom random = new SecureRandom();
     private static int RANDOM_STR_LEN = 8;
 
-    public static File testDir;
+    static File testDir;
 
     @BeforeClass
     public static void before() {

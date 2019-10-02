@@ -79,7 +79,7 @@ pub extern "system" fn Java_io_zbox_fs_Env_initEnv(
     env: JNIEnv,
     _class: JClass,
     level: JString,
-) -> jint {
+) {
     let lvl_str: String = env.get_string(level).unwrap().into();
     let lvl = Level::from_str(&lvl_str).unwrap();
 
@@ -88,7 +88,6 @@ pub extern "system" fn Java_io_zbox_fs_Env_initEnv(
     );
 
     init_env(env);
-    0
 }
 
 #[no_mangle]
