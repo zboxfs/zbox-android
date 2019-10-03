@@ -1,7 +1,5 @@
 package io.zbox.fs;
 
-import androidx.annotation.NonNull;
-
 /**
  * <p>The {@code Repo} class represents an encrypted repository containing the whole file system.</p>
  *
@@ -33,6 +31,43 @@ import androidx.annotation.NonNull;
  *
  * <p>Optionally, {@code Repo} can be opened in read-only mode if you only need read access.</p>
  *
+ * <h3>Examples</h3>
+ *
+ * <p>Create an OS file system based repository.</p>
+ *
+ * <blockquote><pre>
+ * // initialise ZboxFS environment, called first and once
+ * Env.init(Env.LOG_DEBUG);
+ *
+ * // create a OS file system based repository
+ * try {
+ *     Repo repo = new RepoOpener().create(true).open("file:///path/to/repo", "pwd");
+ * } catch (ZboxException err) {
+ *     System.out.println("Error: " + err);
+ * }
+ * </pre></blockquote>
+ *
+ * <p>Create a memory based repository.</p>
+ *
+ * <blockquote><pre>
+ * Repo repo = new RepoOpener().create(true).open("mem://foo", "pwd");
+ * </pre></blockquote>
+ *
+ * <p>Create a Zbox Cloud Storage repository.</p>
+ *
+ * <blockquote><pre>
+ * Repo repo = new RepoOpener().create(true).open("zbox://9ArJY6wMBULS7V3kXKxqv3XP@jJT5sSjAf3W5cW", "pwd");
+ * </pre></blockquote>
+ *
+ * <p>Open a repository in read-only mode.</p>
+ *
+ * <blockquote><pre>
+ * Repo repo = new RepoOpener()
+ *                  .create(true)
+ *                  .readOnly(true)
+ *                  .open("mem://foo", "pwd");
+ * </pre></blockquote>
+ *
  * @author Bo Lu
  * @see io.zbox.fs.File
  *
@@ -44,15 +79,41 @@ public class Repo extends RustObject {
     private Repo() {
     }
 
+    /**
+     * Returns whether the URI points at an existing repository.
+     *
+     * @param uri the repository URI
+     * @return {@code true} if repository existing, otherwise {@code false}
+     * @throws ZboxException if any error happened
+     */
     public static boolean exists(String uri) throws ZboxException {
         checkNullParam(uri);
         return jniExists(uri);
     }
 
+    /**
+     * Get repository metadata information.
+     *
+     * @return repository metadata information
+     */
     public RepoInfo info() {
         return this.jniInfo();
     }
 
+    /**
+     * Reset password for the repository.
+     *
+     * <p>Note: if this method failed due to IO error, super block might be damaged. If it is the
+     * case, use {@link #repairSuperBlock(String, String)} to restore super block before re-opening
+     * the repo.</p>
+     *
+     * @param oldPwd old password
+     * @param newPwd new password
+     * @param opsLimit password encryption operation limit
+     * @param memLimit password encryption memory limit
+     * @throws ZboxException if any error happened
+     * @see #repairSuperBlock(String, String)
+     */
     public void resetPassword(String oldPwd, String newPwd,
                               OpsLimit opsLimit, MemLimit memLimit) throws ZboxException {
         checkNullParam2(oldPwd, newPwd);
@@ -60,81 +121,237 @@ public class Repo extends RustObject {
         this.jniResetPassword(oldPwd, newPwd, opsLimit.getValue(), memLimit.getValue());
     }
 
+    /**
+     * Repair possibly damaged super block.
+     *
+     * <p>This method will try to repair super block using backup. One scenario is when
+     * {@link #resetPassword(String, String, OpsLimit, MemLimit)} failed due to IO error, super
+     * block might be damaged. Using this method can restore the damaged super block from backup. If
+     * super block is all good, this method is no-op.</p>
+     *
+     * <p>This method is not useful for memory-based storage and must be called when repo is closed.
+     * </p>
+     *
+     * @param uri repository URI
+     * @param pwd password
+     * @throws ZboxException if any error happened
+     * @see #resetPassword(String, String, OpsLimit, MemLimit)
+     */
     public static void repairSuperBlock(String uri, String pwd) throws ZboxException {
         checkNullParam2(uri, pwd);
         jniRepairSuperBlock(uri, pwd);
     }
 
+    /**
+     * Returns whether the path points at an existing entity in repository.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the file or directory
+     * @return {@code true} if the path exists, otherwise {@code false}
+     * @throws ZboxException if any error happened
+     */
     public boolean pathExists(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniPathExists(path);
     }
 
+    /**
+     * Returns whether the path exists in repository and is pointing at a regular file.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the file
+     * @return {@code true} if the file exists, otherwise {@code false}
+     * @throws ZboxException if any error happened
+     */
     public boolean isFile(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniIsFile(path);
     }
 
+    /**
+     * Returns whether the path exists in repository and is pointing at a directory.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the directory
+     * @return {@code true} if the directory exists, otherwise {@code false}
+     * @throws ZboxException if any error happened
+     */
     public boolean isDir(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniIsDir(path);
     }
 
+    /**
+     * Create a file in read-write mode.
+     *
+     * <p>This method will create a file if it does not exist, and will truncate it if it does.</p>
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the file to be created
+     * @return {@code File} instance created
+     * @throws ZboxException if any error happened
+     * @see io.zbox.fs.OpenOptions#open(Repo, String)
+     */
     public File createFile(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniCreateFile(path);
     }
 
+    /**
+     * Attempts to open a file in read-only mode.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the file to be opened
+     * @return {@code File} instance opened
+     * @throws ZboxException if any error happened
+     * @see io.zbox.fs.OpenOptions#open(Repo, String)
+     */
     public File openFile(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniOpenFile(path);
     }
 
+    /**
+     * Creates a new, empty directory at the specified path.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the directory to be created
+     * @throws ZboxException if any error happened
+     * @see #createDirAll(String)
+     */
     public void createDir(String path) throws ZboxException {
         checkNullParam(path);
         this.jniCreateDir(path);
     }
 
+    /**
+     * Recursively create a directory and all of its parent components if they are missing.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the directory to be created
+     * @throws ZboxException if any error happened
+     * @see #createDir(String)
+     */
     public void createDirAll(String path) throws ZboxException {
         checkNullParam(path);
         this.jniCreateDirAll(path);
     }
 
+    /**
+     * Returns a vector of all the entries within a directory.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the directory to be read
+     * @return array of directory entries
+     * @throws ZboxException if any error happened
+     */
     public DirEntry[] readDir(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniReadDir(path);
     }
 
+    /**
+     * Get the metadata about a file or directory at specified path.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the file or directory
+     * @return {@code File} or {@code Directory} metadata
+     * @throws ZboxException if any error happened
+     */
     public Metadata metadata(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniMetadata(path);
     }
 
+    /**
+     * Return a vector of history versions of a regular file at specified path.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the regular file
+     * @return array of file content versions
+     * @throws ZboxException if any error happened
+     */
     public Version[] history(String path) throws ZboxException {
         checkNullParam(path);
         return this.jniHistory(path);
     }
 
+    /**
+     * Copies the content of one file to another.
+     *
+     * <p>This method will overwrite the content of {@code to}.</p>
+     *
+     * <p>If {@code from} and {@code to} both point to the same file, this method is no-op.</p>
+     *
+     * <p>{@code from} and {@code to} must be absolute paths to regular files.</p>
+     *
+     * @param from absolute path of the source regular file
+     * @param to absolute path of the target regular file
+     * @throws ZboxException if any error happened
+     */
     public void copy(String from, String to) throws ZboxException {
         checkNullParam2(from, to);
         this.jniCopy(from, to);
     }
 
+    /**
+     * Removes a regular file from the repository.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the regular file to be removed
+     * @throws ZboxException if any error happened
+     */
     public void removeFile(String path) throws ZboxException {
         checkNullParam(path);
         this.jniRemoveFile(path);
     }
 
+    /**
+     * Remove an existing empty directory.
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the directory to be removed
+     * @throws ZboxException if any error happened
+     * @see #removeDirAll(String)
+     */
     public void removeDir(String path) throws ZboxException {
         checkNullParam(path);
         this.jniRemoveDir(path);
     }
 
+    /**
+     * Removes a directory at this path, after removing all its children. Use carefully!
+     *
+     * <p>{@code path} must be an absolute path.</p>
+     *
+     * @param path absolute path of the directory to be removed
+     * @throws ZboxException if any error happened
+     * @see #removeDir(String)
+     */
     public void removeDirAll(String path) throws ZboxException {
         checkNullParam(path);
         this.jniRemoveDirAll(path);
     }
 
+    /**
+     * Rename a file or directory to a new name, replacing the original file if to already exists.
+     *
+     * @param from absolute path of the source regular file
+     * @param to absolute path of the target regular file
+     * @throws ZboxException if any error happened
+     */
     public void rename(String from, String to) throws ZboxException {
         checkNullParam2(from, to);
         this.jniRename(from, to);

@@ -15,7 +15,6 @@
  *     <li><b>File</b> provides file I/O methods, such as read, write, seek and etc.</li>
  * </ul>
  *
- *
  * <p>{@link io.zbox.fs.Env#init(java.lang.String)} initialises the environment and should be called
  * once before any other methods provided by ZboxFS.</p>
  *
