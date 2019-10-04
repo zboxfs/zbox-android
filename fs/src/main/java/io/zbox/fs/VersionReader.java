@@ -1,7 +1,5 @@
 package io.zbox.fs;
 
-import androidx.annotation.NonNull;
-
 import java.nio.ByteBuffer;
 
 public class VersionReader extends RustObject {
@@ -15,7 +13,7 @@ public class VersionReader extends RustObject {
     private VersionReader() {
     }
 
-    public long read(@NonNull ByteBuffer dst) throws ZboxException {
+    public long read(ByteBuffer dst) throws ZboxException {
         checkNullParam(dst);
 
         if (dst.isDirect()) {
@@ -60,17 +58,17 @@ public class VersionReader extends RustObject {
         return ret;
     }
 
-    public long seek(long offset, @NonNull SeekFrom whence) throws ZboxException {
+    public long seek(long offset, SeekFrom whence) throws ZboxException {
         checkNullParam(whence);
         return this.jniSeek(offset, whence.getValue());
     }
 
     // jni methods
-    private native long jniRead(ByteBuffer dst);
+    private native long jniRead(ByteBuffer dst) throws ZboxException;
 
-    private native ByteBuffer jniReadAll();
+    private native ByteBuffer jniReadAll() throws ZboxException;
 
-    private native long jniSeek(long offset, int whence);
+    private native long jniSeek(long offset, int whence) throws ZboxException;
 }
 
 

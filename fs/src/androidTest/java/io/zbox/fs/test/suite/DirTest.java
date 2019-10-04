@@ -11,6 +11,7 @@ import io.zbox.fs.ZboxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DirTest {
@@ -98,6 +99,7 @@ public class DirTest {
         assertEquals(dirs.length, 2);
         assertEquals(dirs[0].fileName, "1");
         assertEquals(dirs[0].path, dir1);
+        assertNotNull(dirs[0].metadata);
         assertEquals(dirs[1].fileName, "2");
         assertEquals(dirs[1].path, dir2);
     }

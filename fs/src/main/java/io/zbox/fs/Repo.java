@@ -42,6 +42,7 @@ package io.zbox.fs;
  * // create a OS file system based repository
  * try {
  *     Repo repo = new RepoOpener().create(true).open("file:///path/to/repo", "pwd");
+ *     repo.close();
  * } catch (ZboxException err) {
  *     System.out.println("Error: " + err);
  * }
@@ -358,41 +359,42 @@ public class Repo extends RustObject {
     }
 
     // jni methods
-    private native static boolean jniExists(String uri);
+    private native static boolean jniExists(String uri) throws ZboxException;
 
     private native RepoInfo jniInfo();
 
-    private native void jniResetPassword(String oldPwd, String newPwd, int opsLimit, int memLimit);
+    private native void jniResetPassword(String oldPwd, String newPwd,
+                                         int opsLimit, int memLimit) throws ZboxException;
 
-    private static native void jniRepairSuperBlock(String uri, String pwd);
+    private static native void jniRepairSuperBlock(String uri, String pwd) throws ZboxException;
 
-    private native boolean jniPathExists(String path);
+    private native boolean jniPathExists(String path) throws ZboxException;
 
-    private native boolean jniIsFile(String path);
+    private native boolean jniIsFile(String path) throws ZboxException;
 
-    private native boolean jniIsDir(String path);
+    private native boolean jniIsDir(String path) throws ZboxException;
 
-    private native File jniCreateFile(String path);
+    private native File jniCreateFile(String path) throws ZboxException;
 
-    private native File jniOpenFile(String path);
+    private native File jniOpenFile(String path) throws ZboxException;
 
-    private native void jniCreateDir(String path);
+    private native void jniCreateDir(String path) throws ZboxException;
 
-    private native void jniCreateDirAll(String path);
+    private native void jniCreateDirAll(String path) throws ZboxException;
 
-    private native DirEntry[] jniReadDir(String path);
+    private native DirEntry[] jniReadDir(String path) throws ZboxException;
 
-    private native Metadata jniMetadata(String path);
+    private native Metadata jniMetadata(String path) throws ZboxException;
 
-    private native Version[] jniHistory(String path);
+    private native Version[] jniHistory(String path) throws ZboxException;
 
-    private native void jniCopy(String from, String to);
+    private native void jniCopy(String from, String to) throws ZboxException;
 
-    private native void jniRemoveFile(String path);
+    private native void jniRemoveFile(String path) throws ZboxException;
 
-    private native void jniRemoveDir(String path);
+    private native void jniRemoveDir(String path) throws ZboxException;
 
-    private native void jniRemoveDirAll(String path);
+    private native void jniRemoveDirAll(String path) throws ZboxException;
 
-    private native void jniRename(String from, String to);
+    private native void jniRename(String from, String to) throws ZboxException;
 }

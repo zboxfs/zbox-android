@@ -1,7 +1,5 @@
 package io.zbox.fs.test.suite;
 
-import android.util.Log;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class FileTest {
-
-    private static final String TAG = "FileTest";
 
     private Repo repo;
     private ByteBuffer buf, buf2, dst;
@@ -405,6 +401,60 @@ public class FileTest {
         buf.rewind();
         dst.rewind();
         assertEquals(dst.get(), buf.get());
+        file.close();
+    }
+
+    @Test
+    public void exampleCodeInDoc() throws ZboxException {
+        String path = "/file11";
+        byte[] buf = {1, 2, 3, 4, 5, 6};
+        byte[] buf2 = {7, 8};
+
+        // create a file and write data to it
+        File file = new OpenOptions().create(true).open(repo, path);
+        file.writeOnce(buf);
+
+        // read the first 2 bytes
+        byte[] dst = new byte[2];
+        file.seek(0, SeekFrom.START);
+        assertEquals(file.read(dst), 2);  // dst: [1, 2]
+        assertEquals(dst[0], 1);
+        assertEquals(dst[1], 2);
+
+        // create a new version, now the file content is [1, 2, 7, 8, 5, 6]
+        file.writeOnce(buf2);
+
+        // notice that reading is on the latest version
+        file.seek(-2, SeekFrom.CURRENT);
+        assertEquals(file.read(dst), 2);  // dst: [7, 8]
+        assertEquals(dst[0], 7);
+        assertEquals(dst[1], 8);
+
+        file.close();
+    }
+
+    @Test
+    public void exampleCodeInDoc2() throws ZboxException {
+        String path = "/file12";
+
+        // create a file and write 2 versions
+        File file = new OpenOptions().create(true).versionLimit(4).open(repo, path);
+        file.writeOnce("foo".getBytes());
+        file.writeOnce("bar".getBytes());
+
+        // get latest version number
+        long currVersion = file.currVersion();
+
+        // create a version reader and read latest version of content
+        VersionReader vr = file.versionReader(currVersion);
+        ByteBuffer buf = vr.readAll();  // buf: "foobar"
+        vr.close();
+
+        // create another version reader and read previous version of content
+        vr = file.versionReader(currVersion - 1);
+        buf = vr.readAll();  // buf: "foo"
+        vr.close();
+
         file.close();
     }
 

@@ -1,7 +1,5 @@
 package io.zbox.fs;
 
-import androidx.annotation.NonNull;
-
 public class OpenOptions extends RustObject {
 
     private static int rustObjId = 102;
@@ -49,7 +47,7 @@ public class OpenOptions extends RustObject {
         return this;
     }
 
-    public File open(@NonNull Repo repo, @NonNull String path) throws ZboxException {
+    public File open(Repo repo, String path) throws ZboxException {
         checkNullParam2(repo, path);
         return this.jniOpen(repo, path);
     }

@@ -6,11 +6,30 @@ package io.zbox.fs;
  * @author Bo Lu
  */
 public final class Env {
-    // log levels
+
+    /**
+     * Log level {@code ERROR}
+     */
     public static String LOG_ERROR = "Error";
+
+    /**
+     * Log level {@code WARN}
+     */
     public static String LOG_WARN = "Warn";
+
+    /**
+     * Log level {@code INFO}
+     */
     public static String LOG_INFO = "Info";
+
+    /**
+     * Log level {@code Debug}
+     */
     public static String LOG_DEBUG = "Debug";
+
+    /**
+     * Log level {@code TRACE}
+     */
     public static String LOG_TRACE = "Trace";
 
     /**
@@ -27,6 +46,8 @@ public final class Env {
      *            <li>Env.LOG_DEBUG</li>
      *            <li>Env.LOG_TRACE</li>
      *        </ul>
+     *
+     *        {@code LOG_WARN} is default.
      */
     public static void init(String logLevel) {
         String lvl = logLevel == null ? "Warn" : logLevel;
