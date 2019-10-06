@@ -104,6 +104,8 @@ import java.nio.ByteBuffer;
  * // notice that reading is on the latest version
  * file.seek(-2, SeekFrom.CURRENT);
  * file.read(dst);  // dst: [7, 8]
+ *
+ * fie.close();
  * </pre></blockquote>
  *
  * <p>Read multiple versions using {@link VersionReader}.</p>
@@ -126,6 +128,8 @@ import java.nio.ByteBuffer;
  * vr = file.versionReader(currVersion - 1);
  * buf = vr.readAll();  // buf: "foo"
  * vr.close();
+ *
+ * fie.close();
  * </pre></blockquote>
  *
  * @author Bo Lu
@@ -176,14 +180,49 @@ public class File extends RustObject {
         return this.jniCurrVersion();
     }
 
+    /**
+     * Get a reader of the specified version.
+     *
+     * <p>The returned reader is a {@link VersionReader}. To get the version number, first call
+     * {@link #history()} to get the list of all versions and then choose the version number from
+     * it.</p>
+     *
+     * @param verNum version number
+     * @return a version reader
+     * @throws ZboxException if any error happened
+     */
     public VersionReader versionReader(long verNum) throws ZboxException {
         return this.jniVersionReader(verNum);
     }
 
+    /**
+     * Truncates or extends the underlying file, create a new version of content which size to
+     * become {@code size}.
+     *
+     * <p>If the size is less than the current content size, then the new content will be shrunk.
+     * If it is greater than the current content size, then the content will be extended to size
+     * and have all of the intermediate data filled in with 0s.</p>
+     *
+     * @param len the new length to be set
+     * @throws ZboxException if any error happened
+     */
     public void setLen(long len) throws ZboxException {
         this.jniSetLen(len);
     }
 
+    /**
+     * Pull some bytes from this file into the specified buffer, returning how many bytes were read.
+     *
+     * <p>The bytes are appended to the destination buffer {@code dst}. That is, the writing starts
+     * from the current position in {@code dst}.</p>
+     *
+     * <p>It is recommended to use a direct {@link java.nio.ByteBuffer} to avoid extra memory
+     * allocation.</p>
+     *
+     * @param dst the byte buffer into which bytes are to be written
+     * @return number of bytes were read
+     * @throws ZboxException if any error happened
+     */
     public long read(ByteBuffer dst) throws ZboxException {
         checkNullParam(dst);
 
@@ -200,6 +239,24 @@ public class File extends RustObject {
         return ret;
     }
 
+    /**
+     * Pull some bytes from this file into the specified byte array, returning how many bytes were
+     * read.
+     *
+     * <p>This method copies {@code n} bytes from this file into the given destination array. If
+     * there is no exception thrown, then it must be guaranteed that {@code 0 <= n <= len}.</p>
+     *
+     * <p>It is recommended to make {@code len} less than 16KB (16384) to avoid extra memory
+     * allocation.</p>
+     *
+     * @param dst the array into which bytes are to be written
+     * @param off the offset within the array of the first byte to be written; must be non-negative
+     *            and no larger than dst.length
+     * @param len the maximum number of bytes to be written to the given array; must be non-negative
+     *            and no larger than dst.length - offset
+     * @return number of bytes were read
+     * @throws ZboxException if any error happened
+     */
     public int read(byte[] dst, int off, int len) throws ZboxException {
         ByteBuffer buf;
 
@@ -219,6 +276,25 @@ public class File extends RustObject {
         return ret;
     }
 
+    /**
+     * Pull some bytes from this file into the specified byte array, returning how many bytes were
+     * read.
+     *
+     * <p>This method copies bytes from this file into the given destination array. An invocation of
+     * this method of the form {@code file.read(dst)} behaves in exactly the same way as the
+     * invocation
+     *
+     * <blockquote><pre>
+     * file.read(dst, 0, dst.length)
+     * </pre></blockquote>
+     *
+     * <p>It is recommended to make {@code dst.length} less than 16KB (16384) to avoid extra memory
+     * allocation.</p>
+     *
+     * @param dst the array into which bytes are to be written
+     * @return number of bytes were read
+     * @throws ZboxException if any error happened
+     */
     public int read(byte[] dst) throws ZboxException {
         return this.read(dst, 0, dst.length);
     }
