@@ -50,7 +50,12 @@ public final class Env {
      *        {@code LOG_WARN} is default.
      */
     public static void init(String logLevel) {
-        String lvl = logLevel == null ? "Warn" : logLevel;
+        String lvl = logLevel == null ? LOG_WARN : logLevel;
+        if (!(lvl.equals(LOG_ERROR) || lvl.equals(LOG_WARN) || lvl.equals(LOG_INFO)
+                || lvl.equals(LOG_DEBUG) || lvl.equals(LOG_TRACE)))
+        {
+            throw new IllegalArgumentException();
+        }
         initEnv(lvl);
     }
 

@@ -133,11 +133,12 @@ import java.nio.ByteBuffer;
  * </pre></blockquote>
  *
  * @author Bo Lu
- * @see io.zbox.fs.Repo
+ * @see Repo
+ * @see OpenOptions
  */
 public class File extends RustObject {
 
-    private static int rustObjId = 103;
+    private static final int rustObjId = 103;
 
     // read buffer
     private static final int READ_BUF_CAP = 16 * 1024;
@@ -222,6 +223,7 @@ public class File extends RustObject {
      * @param dst the byte buffer into which bytes are to be written
      * @return number of bytes were read
      * @throws ZboxException if any error happened
+     * @see #readAll()
      */
     public long read(ByteBuffer dst) throws ZboxException {
         checkNullParam(dst);
@@ -282,7 +284,7 @@ public class File extends RustObject {
      *
      * <p>This method copies bytes from this file into the given destination array. An invocation of
      * this method of the form {@code file.read(dst)} behaves in exactly the same way as the
-     * invocation
+     * invocation</p>
      *
      * <blockquote><pre>
      * file.read(dst, 0, dst.length)
@@ -299,18 +301,51 @@ public class File extends RustObject {
         return this.read(dst, 0, dst.length);
     }
 
+    /**
+     * Read all bytes until end of the file, placing them into the returned buffer.
+     *
+     * @return the byte buffer holds all read bytes
+     * @throws ZboxException if any error happened
+     * @see #read(ByteBuffer)
+     */
     public ByteBuffer readAll() throws ZboxException {
         ByteBuffer ret = this.jniReadAll();
         ret.position(ret.limit());
         return ret;
     }
 
+    /**
+     * Write a buffer into this file, returning how many bytes were written.
+     *
+     * @param buf the source byte buffer from which bytes are to be read
+     * @return number of bytes were written
+     * @throws ZboxException if any error happened
+     * @see #writeOnce(ByteBuffer)
+     */
     public long write(ByteBuffer buf) throws ZboxException {
         checkNullParam(buf);
         ByteBuffer src = this.ensureDirectBuf(buf);
         return this.jniWrite(src);
     }
 
+    /**
+     * Write some bytes from the specified byte array into this file, returning how many bytes were
+     * written.
+     *
+     * <p>This method copies {@code n} bytes from the given source array into this file. If there is
+     * no exception thrown, then it must be guaranteed that {@code 0 <= n <= len}.</p>
+     *
+     * <p>It is recommended to make {@code len} less than 16KB (16384) to avoid extra memory
+     * allocation.</p>
+     *
+     * @param src the source array from which bytes are to be read
+     * @param off the offset within the array of the first byte to be read; must be non-negative
+     *            and no larger than dst.length
+     * @param len the maximum number of bytes to be read from the given array; must be non-negative
+     *            and no larger than dst.length - offset
+     * @return number of bytes were written
+     * @throws ZboxException if any error happened
+     */
     public int write(byte[] src, int off, int len) throws ZboxException {
         ByteBuffer buf;
 
@@ -329,20 +364,68 @@ public class File extends RustObject {
         return (int) this.jniWrite(buf);
     }
 
+    /**
+     * Write some bytes from the specified byte array into this file, returning how many bytes were
+     * written.
+     *
+     * <p>This method copies bytes from the given source array into this file. An invocation of
+     * this method of the form {@code file.write(dst)} behaves in exactly the same way as the
+     * invocation</p>
+     *
+     * <blockquote><pre>
+     * file.write(src, 0, src.length)
+     * </pre></blockquote>
+     *
+     * <p>It is recommended to make {@code src.length} less than 16KB (16384) to avoid extra memory
+     * allocation.</p>
+     *
+     * @param src the source array from which bytes are to be read
+     * @return number of bytes were written
+     * @throws ZboxException if any error happened
+     */
     public int write(byte[] src) throws ZboxException {
         return this.write(src, 0, src.length);
     }
 
+    /**
+     * Complete multi-part write to file and create a new version.
+     *
+     * @throws ZboxException if any error happened
+     * @see #write(ByteBuffer)
+     */
     public void finish() throws ZboxException {
         this.jniFinish();
     }
 
+    /**
+     * Single-part write to file and create a new version.
+     *
+     * <p>This method provides a convenient way to combine {@link #write(byte[])} and
+     * {@link #finish()}.</p>
+     *
+     * <p>It is recommended to use a direct {@link java.nio.ByteBuffer} to avoid extra memory
+     * allocation.</p>
+     *
+     * @param buf the source byte buffer from which bytes are to be read
+     * @throws ZboxException if any error happened
+     * @see #write(ByteBuffer)
+     */
     public void writeOnce(ByteBuffer buf) throws ZboxException {
         checkNullParam(buf);
         ByteBuffer src = this.ensureDirectBuf(buf);
         this.jniWriteOnce(src);
     }
 
+    /**
+     * Single-part write to file and create a new version.
+     *
+     * <p>This method provides a convenient way to combine {@link #write(byte[])} and
+     * {@link #finish()}.</p>
+     *
+     * @param buf the source byte array from which bytes are to be read
+     * @throws ZboxException if any error happened
+     * @see #write(byte[])
+     */
     public void writeOnce(byte[] buf) throws ZboxException {
         checkNullParam(buf);
         ByteBuffer bytes = ByteBuffer.wrap(buf);
@@ -351,9 +434,24 @@ public class File extends RustObject {
         this.jniWriteOnce(src);
     }
 
-    public long seek(long offset, SeekFrom whence) throws ZboxException {
+    /**
+     * Seek to an offset, relative to from in bytes, in this file.
+     *
+     * <p>This method returns the new position from the start of the content. That position can be
+     * used later with {@link SeekFrom#START}.</p>
+     *
+     * <p>A seek beyond the end of the file is allowed. In this case, subsequent write will extend
+     * the file and have all of the intermediate data filled in with 0s.</p>
+     *
+     * @param off the offset within this file, relative to {@code whence}
+     * @param whence the start point to calculate seek offset
+     * @return new position from the start of the content
+     * @throws ZboxException if any error happened
+     * @see SeekFrom
+     */
+    public long seek(long off, SeekFrom whence) throws ZboxException {
         checkNullParam(whence);
-        return this.jniSeek(offset, whence.getValue());
+        return this.jniSeek(off, whence.getValue());
     }
 
     // jni methods

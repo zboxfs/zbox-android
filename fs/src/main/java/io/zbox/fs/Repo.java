@@ -21,10 +21,10 @@ package io.zbox.fs;
  *
  * <h3>Create and open repo</h3>
  *
- * <p>{@code Repo} can be created on different underlying storage using {@link io.zbox.fs.RepoOpener}.
+ * <p>{@code Repo} can be created on different underlying storage using {@link RepoOpener}.
  * It uses an URI-like string to specify its storage type and location. The URI string starts with an
  * identifier which specifies the storage type, as shown in above table. You can check more location
- * URI details at {@link io.zbox.fs.RepoOpener}.</p>
+ * URI details at {@link RepoOpener}.</p>
  *
  * <p>{@code Repo} can only be opened once at a time. After opened, it keeps locked from other open
  * attempts until it is closed.
@@ -75,7 +75,7 @@ package io.zbox.fs;
  */
 public class Repo extends RustObject {
 
-    private static int rustObjId = 101;
+    private static final int rustObjId = 101;
 
     private Repo() {
     }
