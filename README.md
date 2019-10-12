@@ -31,7 +31,13 @@ directory.
 3. Build Zbox Android Library
 
 ```sh
-./gradlew build
+./gradlew install
+```
+
+4. Publish to Bintray
+
+```sh
+./gradlew bintrayUploadnstall
 ```
 
 # License

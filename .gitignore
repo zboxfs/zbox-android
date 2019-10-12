@@ -12,5 +12,4 @@
 /captures
 .externalNativeBuild
 .cxx
-/fs/src/main/jniLibs/arm64-v8a/libzboxfs.so
-/fs/src/main/jniLibs/x86_64/libzboxfs.so
+/**/*.so

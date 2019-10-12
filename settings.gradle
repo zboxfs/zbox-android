@@ -1,2 +1,2 @@
-include ':fs'
-rootProject.name='zbox-android'
+include ':zboxfs'
+rootProject.name='ZboxFS'
