@@ -34,7 +34,7 @@ directory.
 ./gradlew install
 ```
 
-4. Publish to Bintray
+4. Upload to Bintray
 
 ```sh
 ./gradlew bintrayUploadnstall
