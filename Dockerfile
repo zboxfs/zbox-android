@@ -36,8 +36,8 @@ ENV PKG_CONFIG_PATH_x86_64_linux_android ${LIBSODIUM_HOME}/libsodium-android-wes
 # make a dummy project and pre-build dependencies
 RUN mkdir -p /tmp/zbox/.cargo
 WORKDIR /tmp/zbox
-COPY ./zboxfs/Cargo.toml ./
-COPY ./zboxfs/.cargo/config .cargo/
+COPY ./zbox/Cargo.toml ./
+COPY ./zbox/.cargo/config .cargo/
 RUN mkdir src && \
     echo "// dummy file" > src/lib.rs && \
     echo "fn main() {}" > build.rs && \
