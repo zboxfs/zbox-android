@@ -9,7 +9,7 @@ ext {
     // Artifact name, e.g. "io.zbox:zboxfs:0.1.0"
     publishedGroupId = 'io.zbox' // Group ID of the SDK which will be added in implementation line of gradle
     artifact = 'zboxfs' // Artifact ID of the SDK which will be added in implementation line of gradle
-    libraryVersion = '0.1.0' // Version of the library you created in Bintray
+    libraryVersion = '0.1.1' // Version of the library you created in Bintray
 
     libraryName = 'zboxfs' // It is generally the module name
     libraryDescription = 'Android bindinng for ZboxFS' // Small description of the library
@@ -47,7 +47,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

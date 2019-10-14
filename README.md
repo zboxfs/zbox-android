@@ -6,6 +6,18 @@ ZboxFS is a zero-details, privacy-focused in-app file system. Its goal is
 to help application store files securely, privately and reliably. Check more
 details about [ZboxFS].
 
+# How to Use
+
+Add below dependency snippet to your mudule's gradle file:
+
+```gradle
+implementation 'io.zbox:zboxfs:0.1.1'
+```
+
+# Documentation
+
+Check the Java doc [reference documentation](https://docs.zbox.io/android).
+
 # How to Build
 
 You need [Docker] and [JDK] to build this package.
@@ -37,7 +49,7 @@ directory.
 4. Upload to Bintray
 
 ```sh
-./gradlew bintrayUploadnstall
+./gradlew bintrayUpload
 ```
 
 # License
