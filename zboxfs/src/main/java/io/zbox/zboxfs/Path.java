@@ -4,6 +4,10 @@ public class Path {
 
     private String path;
 
+    public Path() {
+        this.path = "/";
+    }
+
     public Path(String path) throws ZboxException {
         jniValidate(path);
         this.path = path;
@@ -14,9 +18,35 @@ public class Path {
         return path;
     }
 
-    public boolean isRoot() { return path.equals("/"); }
+    public static Path root() {
+        return new Path();
+    }
 
-    public boolean equals(Path other) { return path.equals(other.path); }
+    public boolean isRoot() {
+        return path.equals("/");
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null || other.getClass() != this.getClass()) {
+            return false;
+        }
+
+        return path.equals(((Path)other).path);
+    }
+
+    public boolean equals(Path other) {
+        if (other == null) return false;
+        return path.equals(other.path);
+    }
+
+    public boolean equals(String other) {
+        if (other == null) return false;
+        return path.equals(other);
+    }
 
     public Path parent() {
         String parent = jniParent(path);
@@ -34,14 +64,17 @@ public class Path {
     }
 
     public String stripPrefix(String base) {
+        if (base == null) return null;
         return jniStripPrefix(path, base);
     }
 
     public boolean startsWith(String base) {
+        if (base == null) return false;
         return jniStartsWith(path, base);
     }
 
     public boolean endsWith(String child) {
+        if (child == null) return false;
         return jniEndsWith(path, child);
     }
 
@@ -53,15 +86,37 @@ public class Path {
         return jniExtension(path);
     }
 
-    public void join(String path) {
-        this.path = jniJoin(this.path, path);
+    public Path join(String path) {
+        if (path == null) return this;
+        String newPath = jniJoin(this.path, path);
+        Path ret = null;
+        try {
+            ret = new Path(newPath);
+        } catch (ZboxException ignore) {
+            // never reach here
+        }
+        return ret;
+    }
+
+    public void push(String path) {
+        if (path == null) return;
+        this.path = jniPush(this.path, path);
+    }
+
+    public boolean pop() {
+        String newPath = jniPop(this.path);
+        boolean ret = !this.path.equals(newPath);
+        this.path = newPath;
+        return ret;
     }
 
     public void setFileName(String fileName) {
+        if (fileName == null) return;
         this.path = jniSetFileName(this.path, fileName);
     }
 
     public void setExtension(String extension) {
+        if (extension == null) return;
         this.path = jniSetExtension(this.path, extension);
     }
 
@@ -87,6 +142,10 @@ public class Path {
     private native String jniExtension(String path);
 
     private native String jniJoin(String path, String path2);
+
+    private native String jniPush(String path, String other);
+
+    private native String jniPop(String path);
 
     private native String jniSetFileName(String path, String fileName);
 

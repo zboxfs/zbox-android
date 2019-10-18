@@ -11,10 +11,10 @@ package io.zbox.zboxfs;
  * <p>ZboxFS supports a variety of underlying storages, which are listed below.</p>
  *
  * <table border="1" summary="">
- *     <tr><th>Storage</th><th>URI identifier</th></tr>
- *     <tr><td>Memory</td><td><i>"mem://"</i></td></tr>
- *     <tr><td>OS file system</td><td><i>"file://"</i></td></tr>
- *     <tr><td><a href="https://zbox.io">Zbox Cloud Storage</a></td><td><i>"zbox://"</i></td></tr>
+ * <tr><th>Storage</th><th>URI identifier</th></tr>
+ * <tr><td>Memory</td><td><i>"mem://"</i></td></tr>
+ * <tr><td>OS file system</td><td><i>"file://"</i></td></tr>
+ * <tr><td><a href="https://zbox.io">Zbox Cloud Storage</a></td><td><i>"zbox://"</i></td></tr>
  * </table>
  *
  * <p>* Visit <a href="https://zbox.io">zbox.io</a> to learn more about Zbox Cloud Storage.</p>
@@ -71,7 +71,6 @@ package io.zbox.zboxfs;
  *
  * @author Bo Lu
  * @see File
- *
  */
 public class Repo extends RustObject {
 
@@ -108,8 +107,8 @@ public class Repo extends RustObject {
      * case, use {@link #repairSuperBlock(String, String)} to restore super block before re-opening
      * the repo.</p>
      *
-     * @param oldPwd old password
-     * @param newPwd new password
+     * @param oldPwd   old password
+     * @param newPwd   new password
      * @param opsLimit password encryption operation limit
      * @param memLimit password encryption memory limit
      * @throws ZboxException if any error happened
@@ -152,9 +151,9 @@ public class Repo extends RustObject {
      * @return {@code true} if the path exists, otherwise {@code false}
      * @throws ZboxException if any error happened
      */
-    public boolean pathExists(String path) throws ZboxException {
+    public boolean pathExists(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniPathExists(path);
+        return this.jniPathExists(path.toString());
     }
 
     /**
@@ -162,13 +161,13 @@ public class Repo extends RustObject {
      *
      * <p>{@code path} must be an absolute path.</p>
      *
-     * @param path absolute path of the file
+     * @param path path of the file
      * @return {@code true} if the file exists, otherwise {@code false}
      * @throws ZboxException if any error happened
      */
-    public boolean isFile(String path) throws ZboxException {
+    public boolean isFile(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniIsFile(path);
+        return this.jniIsFile(path.toString());
     }
 
     /**
@@ -180,9 +179,9 @@ public class Repo extends RustObject {
      * @return {@code true} if the directory exists, otherwise {@code false}
      * @throws ZboxException if any error happened
      */
-    public boolean isDir(String path) throws ZboxException {
+    public boolean isDir(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniIsDir(path);
+        return this.jniIsDir(path.toString());
     }
 
     /**
@@ -195,11 +194,11 @@ public class Repo extends RustObject {
      * @param path absolute path of the file to be created
      * @return {@code File} instance created
      * @throws ZboxException if any error happened
-     * @see OpenOptions#open(Repo, String)
+     * @see OpenOptions#open(Repo, Path)
      */
-    public File createFile(String path) throws ZboxException {
+    public File createFile(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniCreateFile(path);
+        return this.jniCreateFile(path.toString());
     }
 
     /**
@@ -210,11 +209,11 @@ public class Repo extends RustObject {
      * @param path absolute path of the file to be opened
      * @return {@code File} instance opened
      * @throws ZboxException if any error happened
-     * @see OpenOptions#open(Repo, String)
+     * @see OpenOptions#open(Repo, Path)
      */
-    public File openFile(String path) throws ZboxException {
+    public File openFile(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniOpenFile(path);
+        return this.jniOpenFile(path.toString());
     }
 
     /**
@@ -224,11 +223,11 @@ public class Repo extends RustObject {
      *
      * @param path absolute path of the directory to be created
      * @throws ZboxException if any error happened
-     * @see #createDirAll(String)
+     * @see #createDirAll(Path)
      */
-    public void createDir(String path) throws ZboxException {
+    public void createDir(Path path) throws ZboxException {
         checkNullParam(path);
-        this.jniCreateDir(path);
+        this.jniCreateDir(path.toString());
     }
 
     /**
@@ -238,11 +237,11 @@ public class Repo extends RustObject {
      *
      * @param path absolute path of the directory to be created
      * @throws ZboxException if any error happened
-     * @see #createDir(String)
+     * @see #createDir(Path)
      */
-    public void createDirAll(String path) throws ZboxException {
+    public void createDirAll(Path path) throws ZboxException {
         checkNullParam(path);
-        this.jniCreateDirAll(path);
+        this.jniCreateDirAll(path.toString());
     }
 
     /**
@@ -254,9 +253,9 @@ public class Repo extends RustObject {
      * @return array of directory entries
      * @throws ZboxException if any error happened
      */
-    public DirEntry[] readDir(String path) throws ZboxException {
+    public DirEntry[] readDir(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniReadDir(path);
+        return this.jniReadDir(path.toString());
     }
 
     /**
@@ -268,9 +267,9 @@ public class Repo extends RustObject {
      * @return {@code File} or {@code Directory} metadata
      * @throws ZboxException if any error happened
      */
-    public Metadata metadata(String path) throws ZboxException {
+    public Metadata metadata(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniMetadata(path);
+        return this.jniMetadata(path.toString());
     }
 
     /**
@@ -282,9 +281,9 @@ public class Repo extends RustObject {
      * @return array of file content versions
      * @throws ZboxException if any error happened
      */
-    public Version[] history(String path) throws ZboxException {
+    public Version[] history(Path path) throws ZboxException {
         checkNullParam(path);
-        return this.jniHistory(path);
+        return this.jniHistory(path.toString());
     }
 
     /**
@@ -297,12 +296,12 @@ public class Repo extends RustObject {
      * <p>{@code from} and {@code to} must be absolute paths to regular files.</p>
      *
      * @param from absolute path of the source regular file
-     * @param to absolute path of the target regular file
+     * @param to   absolute path of the target regular file
      * @throws ZboxException if any error happened
      */
-    public void copy(String from, String to) throws ZboxException {
+    public void copy(Path from, Path to) throws ZboxException {
         checkNullParam2(from, to);
-        this.jniCopy(from, to);
+        this.jniCopy(from.toString(), to.toString());
     }
 
     /**
@@ -313,9 +312,9 @@ public class Repo extends RustObject {
      * @param path absolute path of the regular file to be removed
      * @throws ZboxException if any error happened
      */
-    public void removeFile(String path) throws ZboxException {
+    public void removeFile(Path path) throws ZboxException {
         checkNullParam(path);
-        this.jniRemoveFile(path);
+        this.jniRemoveFile(path.toString());
     }
 
     /**
@@ -325,11 +324,11 @@ public class Repo extends RustObject {
      *
      * @param path absolute path of the directory to be removed
      * @throws ZboxException if any error happened
-     * @see #removeDirAll(String)
+     * @see #removeDirAll(Path)
      */
-    public void removeDir(String path) throws ZboxException {
+    public void removeDir(Path path) throws ZboxException {
         checkNullParam(path);
-        this.jniRemoveDir(path);
+        this.jniRemoveDir(path.toString());
     }
 
     /**
@@ -339,23 +338,23 @@ public class Repo extends RustObject {
      *
      * @param path absolute path of the directory to be removed
      * @throws ZboxException if any error happened
-     * @see #removeDir(String)
+     * @see #removeDir(Path)
      */
-    public void removeDirAll(String path) throws ZboxException {
+    public void removeDirAll(Path path) throws ZboxException {
         checkNullParam(path);
-        this.jniRemoveDirAll(path);
+        this.jniRemoveDirAll(path.toString());
     }
 
     /**
      * Rename a file or directory to a new name, replacing the original file if to already exists.
      *
      * @param from absolute path of the source regular file
-     * @param to absolute path of the target regular file
+     * @param to   absolute path of the target regular file
      * @throws ZboxException if any error happened
      */
-    public void rename(String from, String to) throws ZboxException {
+    public void rename(Path from, Path to) throws ZboxException {
         checkNullParam2(from, to);
-        this.jniRename(from, to);
+        this.jniRename(from.toString(), to.toString());
     }
 
     // jni methods

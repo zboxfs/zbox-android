@@ -11,10 +11,10 @@ import java.nio.ByteBuffer;
  * <p>A typical usage pattern is:</p>
  *
  * <ol>
- *     <li>Get file history versions using {@link File#history()}</li>
- *     <li>Get a version reader for a specific version number using {@link File#versionReader}</li>
- *     <li>Read content using {@link #read(ByteBuffer)} or {@link #readAll()}</li>
- *     <li>Close the version reader using {@link #close()}</li>
+ * <li>Get file history versions using {@link File#history()}</li>
+ * <li>Get a version reader for a specific version number using {@link File#versionReader}</li>
+ * <li>Read content using {@link #read(ByteBuffer)} or {@link #readAll()}</li>
+ * <li>Close the version reader using {@link #close()}</li>
  * </ol>
  *
  * <h3>Example</h3>
@@ -106,6 +106,8 @@ public class VersionReader extends RustObject {
      * @throws ZboxException if any error happened
      */
     public int read(byte[] dst, int off, int len) throws ZboxException {
+        checkNullParam(dst);
+
         ByteBuffer buf;
 
         if (len > READ_BUF_CAP) {
@@ -169,7 +171,7 @@ public class VersionReader extends RustObject {
      * <p>A seek beyond the end of the file is allowed. In this case, subsequent write will extend
      * the file and have all of the intermediate data filled in with 0s.</p>
      *
-     * @param off the offset within this file, relative to {@code whence}
+     * @param off    the offset within this file, relative to {@code whence}
      * @param whence the start point to calculate seek offset
      * @return new position from the start of the content
      * @throws ZboxException if any error happened

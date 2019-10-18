@@ -22,7 +22,6 @@ public class TestSuite {
     private static final String NUMBER = "0123456789";
     private static final String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static SecureRandom random = new SecureRandom();
-    private static int RANDOM_STR_LEN = 8;
 
     static File testDir;
 
@@ -47,6 +46,7 @@ public class TestSuite {
     }
 
     public static String randomString() {
+        final int RANDOM_STR_LEN = 8;
         StringBuilder sb = new StringBuilder(RANDOM_STR_LEN);
         for (int i = 0; i < RANDOM_STR_LEN; i++) {
             // 0-62 (exclusive), random returns 0-61
@@ -74,5 +74,4 @@ public class TestSuite {
         }
         dir.delete();
     }
-
 }

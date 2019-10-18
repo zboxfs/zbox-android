@@ -36,24 +36,22 @@ public final class Env {
      * Initialise ZboxFS environment with log level. This method should be called before any other
      * methods provided by ZboxFS and should be called only once.
      *
-     * @param logLevel
-     *        Log output level. Available options are:
+     * @param logLevel Log output level. Available options are:
      *
-     *        <ul>
-     *            <li>Env.LOG_ERROR</li>
-     *            <li>Env.LOG_WARN</li>
-     *            <li>Env.LOG_INFO</li>
-     *            <li>Env.LOG_DEBUG</li>
-     *            <li>Env.LOG_TRACE</li>
-     *        </ul>
-     *
-     *        {@code LOG_WARN} is default.
+     *                 <ul>
+     *                 <li>Env.LOG_ERROR</li>
+     *                 <li>Env.LOG_WARN</li>
+     *                 <li>Env.LOG_INFO</li>
+     *                 <li>Env.LOG_DEBUG</li>
+     *                 <li>Env.LOG_TRACE</li>
+     *                 </ul>
+     *                 <p>
+     *                 {@code LOG_WARN} is default.
      */
     public static void init(String logLevel) {
         String lvl = logLevel == null ? LOG_WARN : logLevel;
         if (!(lvl.equals(LOG_ERROR) || lvl.equals(LOG_WARN) || lvl.equals(LOG_INFO)
-                || lvl.equals(LOG_DEBUG) || lvl.equals(LOG_TRACE)))
-        {
+                || lvl.equals(LOG_DEBUG) || lvl.equals(LOG_TRACE))) {
             throw new IllegalArgumentException();
         }
         initEnv(lvl);

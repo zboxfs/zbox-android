@@ -5,7 +5,7 @@ package io.zbox.zboxfs;
  *
  * @author Bo Lu
  * @see File#history()
- * @see Repo#history(String)
+ * @see Repo#history(Path)
  */
 public class Version {
     /**

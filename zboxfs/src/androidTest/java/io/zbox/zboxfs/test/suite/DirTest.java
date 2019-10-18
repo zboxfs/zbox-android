@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.zbox.zboxfs.DirEntry;
+import io.zbox.zboxfs.Path;
 import io.zbox.zboxfs.Repo;
 import io.zbox.zboxfs.RepoOpener;
 import io.zbox.zboxfs.ZboxException;
@@ -32,23 +33,23 @@ public class DirTest {
 
     @Test(expected = ZboxException.class)
     public void readInvalidDir() throws ZboxException {
-        this.repo.readDir("");
+        this.repo.readDir(new Path(""));
     }
 
     @Test(expected = ZboxException.class)
     public void readInvalidDir2() throws ZboxException {
-        this.repo.readDir("non-exists");
+        this.repo.readDir(new Path("non-exists"));
     }
 
     @Test
     public void readRoot() throws ZboxException {
-        DirEntry[] dirs = this.repo.readDir("/");
+        DirEntry[] dirs = this.repo.readDir(new Path("/"));
         assertEquals(dirs.length, 0);
     }
 
     @Test
     public void createDir() throws ZboxException {
-        String path = "/dir01";
+        Path path = new Path("/dir01");
 
         // create empty dir
         this.repo.createDir(path);
@@ -60,15 +61,15 @@ public class DirTest {
         assertEquals(dirs.length, 0);
 
         // read root dir again
-        dirs = this.repo.readDir("/");
+        dirs = this.repo.readDir(new Path("/"));
         assertTrue(dirs.length > 0);
     }
 
     @Test
     public void createDirRecursively() throws ZboxException {
-        String base = "/dir02";
-        String dir1 = base + "/1";
-        String path = dir1 + "/2";
+        Path base = new Path("/dir02");
+        Path dir1 = base.join("1");
+        Path path = dir1.join("2");
 
         this.repo.createDirAll(path);
         assertTrue(repo.isDir(base));
@@ -88,9 +89,9 @@ public class DirTest {
 
     @Test
     public void readDir() throws ZboxException {
-        String base = "/dir03";
-        String dir1 = base + "/1";
-        String dir2 = base + "/2";
+        Path base = new Path("/dir03");
+        Path dir1 = base.join("1");
+        Path dir2 = base.join("2");
 
         this.repo.createDirAll(dir1);
         this.repo.createDirAll(dir2);
@@ -106,43 +107,43 @@ public class DirTest {
 
     @Test(expected = ZboxException.class)
     public void removeRootDir() throws ZboxException {
-        this.repo.removeDir("/");
+        this.repo.removeDir(Path.root());
     }
 
     @Test(expected = ZboxException.class)
     public void removeNonExistDir() throws ZboxException {
-        this.repo.removeDir("/non-exists");
+        this.repo.removeDir(new Path("/non-exists"));
     }
 
     @Test(expected = ZboxException.class)
     public void removeNonAbsDir() throws ZboxException {
-        this.repo.removeDir("/1/2/3");
+        this.repo.removeDir(new Path("/1/2/3"));
     }
 
     @Test(expected = ZboxException.class)
     public void removeNonEmptyDir() throws ZboxException {
-        String path = "/dir04/1/2/3";
+        Path path = new Path("/dir04/1/2/3");
         this.repo.createDirAll(path);
-        this.repo.removeDir("/dir04/1");
+        this.repo.removeDir(new Path("/dir04/1"));
     }
 
     @Test
     public void removeEmptyDir() throws ZboxException {
-        String path = "/dir05";
+        Path path = new Path("/dir05");
         this.repo.createDir(path);
-        this.repo.removeDir("/dir05");
+        this.repo.removeDir(path);
     }
 
     @Test
     public void removeNonEmptyDirRecursively() throws ZboxException {
-        String path = "/dir06/1/2/3";
+        Path path = new Path("/dir06/1/2/3");
         this.repo.createDirAll(path);
-        this.repo.removeDirAll("/dir06");
+        this.repo.removeDirAll(new Path("/dir06"));
     }
 
     @Test(expected = ZboxException.class)
     public void readRemovedDir() throws ZboxException {
-        String path = "/dir07";
+        Path path = new Path("/dir07");
         this.repo.createDir(path);
         this.repo.removeDir(path);
         this.repo.readDir(path);

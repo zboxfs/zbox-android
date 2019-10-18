@@ -14,6 +14,7 @@ import io.zbox.zboxfs.FileType;
 import io.zbox.zboxfs.MemLimit;
 import io.zbox.zboxfs.Metadata;
 import io.zbox.zboxfs.OpsLimit;
+import io.zbox.zboxfs.Path;
 import io.zbox.zboxfs.Repo;
 import io.zbox.zboxfs.RepoInfo;
 import io.zbox.zboxfs.RepoOpener;
@@ -166,10 +167,11 @@ public class RepoTest {
     @Test
     public void checkPathExists() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
-        assertTrue(repo.pathExists("/"));
-        assertFalse(repo.pathExists("/non-exists"));
-        repo.createDirAll("/1/2/3");
-        assertTrue(repo.pathExists("/1/2/3"));
+        assertTrue(repo.pathExists(Path.root()));
+        assertFalse(repo.pathExists(new Path("/non-exists")));
+        Path path = new Path("/1/2/3");
+        repo.createDirAll(path);
+        assertTrue(repo.pathExists(path));
         repo.close();
     }
 
@@ -183,7 +185,7 @@ public class RepoTest {
     @Test
     public void createFile() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
-        File file = repo.createFile("/abc");
+        File file = repo.createFile(new Path("/abc"));
         assertNotNull(file);
         file.close();
         repo.close();
@@ -192,8 +194,9 @@ public class RepoTest {
     @Test
     public void getMetadataFromPath() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
+        Path path = new Path("/abc");
 
-        File file = repo.createFile("/abc");
+        File file = repo.createFile(path);
         ByteBuffer buf = ByteBuffer.allocateDirect(20);
         buf.put((byte) 1);
         buf.put((byte) 2);
@@ -201,7 +204,7 @@ public class RepoTest {
         file.writeOnce(buf);
         file.close();
 
-        Metadata md = repo.metadata("/abc");
+        Metadata md = repo.metadata(path);
         assertNotNull(md);
         assertEquals(md.fileType, FileType.FILE);
         assertTrue(md.isFile());
@@ -217,8 +220,9 @@ public class RepoTest {
     @Test
     public void getHistoryFromPath() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
+        Path path = new Path("/abc");
 
-        File file = repo.createFile("/abc");
+        File file = repo.createFile(path);
         ByteBuffer buf = ByteBuffer.allocateDirect(20);
         buf.put((byte) 1);
         buf.put((byte) 2);
@@ -226,7 +230,7 @@ public class RepoTest {
         file.writeOnce(buf);
         file.close();
 
-        Version[] hist = repo.history("/abc");
+        Version[] hist = repo.history(path);
         assertNotNull(hist);
         assertEquals(hist.length, 1);
         assertEquals(hist[0].num, 2);
@@ -239,8 +243,10 @@ public class RepoTest {
     @Test
     public void copyFile() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
+        Path src = new Path("/src");
+        Path tgt = new Path("/tgt");
 
-        File file = repo.createFile("/src");
+        File file = repo.createFile(src);
         ByteBuffer buf = ByteBuffer.allocateDirect(20);
         buf.put((byte) 1);
         buf.put((byte) 2);
@@ -248,9 +254,9 @@ public class RepoTest {
         file.writeOnce(buf);
         file.close();
 
-        repo.copy("/src", "/tgt");
-        assertTrue(repo.isFile("/tgt"));
-        Metadata md = repo.metadata("/tgt");
+        repo.copy(src, tgt);
+        assertTrue(repo.isFile(tgt));
+        Metadata md = repo.metadata(tgt);
         assertNotNull(md);
         assertEquals(md.fileType, FileType.FILE);
         assertTrue(md.isFile());
@@ -261,7 +267,7 @@ public class RepoTest {
         assertTrue(md.modifiedAt > 0);
 
         // copy file to itself should success
-        repo.copy("/src", "/src");
+        repo.copy(src, src);
 
         repo.close();
     }
@@ -269,8 +275,8 @@ public class RepoTest {
     @Test
     public void removeFile() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
+        Path path = new Path("/file");
 
-        String path = "/file";
         File file = repo.createFile(path);
         file.close();
 
@@ -282,8 +288,8 @@ public class RepoTest {
     @Test(expected = ZboxException.class)
     public void removeFile2() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
+        Path path = new Path("/file");
 
-        String path = "/file";
         File file = repo.createFile(path);
         file.close();
 
@@ -295,14 +301,15 @@ public class RepoTest {
     public void renameFile() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
 
-        String path = "/file";
+        Path path = new Path("/file");
         File file = repo.createFile(path);
         file.close();
 
+        Path newName = new Path("/new-name");
         assertTrue(repo.pathExists(path));
-        repo.rename(path, "/new-name");
+        repo.rename(path, newName);
         assertFalse(repo.pathExists(path));
-        assertTrue(repo.pathExists("/new-name"));
+        assertTrue(repo.pathExists(newName));
     }
 
     @Test

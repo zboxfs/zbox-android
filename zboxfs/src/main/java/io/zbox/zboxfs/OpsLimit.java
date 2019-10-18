@@ -18,9 +18,9 @@ package io.zbox.zboxfs;
  * seconds on a 2.8 Ghz Core i7 CPU and requires 1024 MB of dedicated RAM.</p>
  *
  * <p>See
- *   <a href="https://download.libsodium.org/doc/password_hashing/the_argon2i_function" target="_blank">
- *     https://download.libsodium.org/doc/password_hashing/the_argon2i_function
- *   </a>for more details.
+ * <a href="https://download.libsodium.org/doc/password_hashing/the_argon2i_function" target="_blank">
+ * https://download.libsodium.org/doc/password_hashing/the_argon2i_function
+ * </a>for more details.
  * </p>
  *
  * @author Bo Lu

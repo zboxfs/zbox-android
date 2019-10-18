@@ -3,7 +3,7 @@ package io.zbox.zboxfs;
 /**
  * Metadata information about a regular file or a directory.
  *
- * <p>This structure is returned from the {@link File#metadata()} and {@link Repo#metadata(String)}
+ * <p>This structure is returned from the {@link File#metadata()} and {@link Repo#metadata(Path)}
  * represents known metadata about a regular file or a directory, such as its type, size,
  * modification times, etc.</p>
  *

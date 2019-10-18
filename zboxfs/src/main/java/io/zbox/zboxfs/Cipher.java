@@ -4,9 +4,9 @@ package io.zbox.zboxfs;
  * Crypto cipher primitives.
  *
  * <p>See
- *   <a href="https://download.libsodium.org/doc/secret-key_cryptography/aead" target="_blank">
- *       https://download.libsodium.org/doc/secret-key_cryptography/aead
- *   </a> for more details.
+ * <a href="https://download.libsodium.org/doc/secret-key_cryptography/aead" target="_blank">
+ * https://download.libsodium.org/doc/secret-key_cryptography/aead
+ * </a> for more details.
  * </p>
  */
 public enum Cipher {

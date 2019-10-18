@@ -10,10 +10,10 @@
  * which provides most API for file system operations and file data I/O.</p>
  *
  * <ul>
- *     <li><b>{@link io.zbox.zboxfs.Repo}</b> provides file system manipulation methods, such as openFile,
- *     createDir and etc.</li>
- *     <li><b>{@link io.zbox.zboxfs.File}</b> provides file I/O methods, such as read, write, seek and etc.
- *     </li>
+ * <li><b>{@link io.zbox.zboxfs.Repo}</b> provides file system manipulation methods, such as openFile,
+ * createDir and etc.</li>
+ * <li><b>{@link io.zbox.zboxfs.File}</b> provides file I/O methods, such as read, write, seek and etc.
+ * </li>
  * </ul>
  *
  * <p>{@link io.zbox.zboxfs.Env#init(java.lang.String)} initialises the environment and should be called

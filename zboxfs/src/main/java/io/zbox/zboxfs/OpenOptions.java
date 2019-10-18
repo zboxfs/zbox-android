@@ -4,11 +4,11 @@ package io.zbox.zboxfs;
  * Options and flags which can be used to configure how a file is opened.
  *
  * <p>This builder exposes the ability to configure how a {@link File} is opened and what operations
- * are permitted on the opened file. The {@link Repo#openFile(String)} and
- * {@link Repo#createFile(String)} methods are aliases for commonly used options using this builder.</p>
+ * are permitted on the opened file. The {@link Repo#openFile(Path)} and
+ * {@link Repo#createFile(Path)} methods are aliases for commonly used options using this builder.</p>
  *
  * <p>Generally speaking, when using {@code OpenOptions}, you'll first call {@link #OpenOptions()},
- * then chain calls to methods to set each option, then call {@link #open(Repo, String)}, passing
+ * then chain calls to methods to set each option, then call {@link #open(Repo, Path)}, passing
  * the path of the file you're trying to open. This will give you an opened {@link File} instance
  * that you can further operate on.</p>
  *
@@ -153,11 +153,11 @@ public class OpenOptions extends RustObject {
      * @param path absolute path of the file or directory to be opened
      * @return the opened file instance
      * @throws ZboxException if any error happened
-     * @see Repo#openFile(String)
+     * @see Repo#openFile(Path)
      */
-    public File open(Repo repo, String path) throws ZboxException {
+    public File open(Repo repo, Path path) throws ZboxException {
         checkNullParam2(repo, path);
-        return this.jniOpen(repo, path);
+        return this.jniOpen(repo, path.toString());
     }
 
     // jni methods

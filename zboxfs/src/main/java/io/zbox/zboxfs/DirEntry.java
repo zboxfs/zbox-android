@@ -1,7 +1,7 @@
 package io.zbox.zboxfs;
 
 /**
- * Entries returned by the {@link Repo#readDir(String)} function.
+ * Entries returned by the {@link Repo#readDir(Path)} function.
  *
  * <p>An instance of {@code DirEntry} represents an entry inside of a directory in the repository.
  * Each entry can be inspected via methods to learn about the full path or other metadata.</p>
@@ -12,7 +12,7 @@ public class DirEntry {
     /**
      * The full path to the file that this entry represents.
      */
-    public String path;
+    public Path path;
 
     /**
      * The bare file name of this directory entry without any other leading path component.

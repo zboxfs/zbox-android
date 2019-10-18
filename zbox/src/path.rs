@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use jni::objects::{JClass, JObject, JString};
 use jni::sys::{jboolean, jobjectArray, jstring};
@@ -57,7 +57,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Path_jniFileName(
             .new_string(file_name.to_str().unwrap())
             .unwrap()
             .into_inner(),
-        None => *JObject::null()
+        None => *JObject::null(),
     }
 }
 
@@ -152,6 +152,32 @@ pub extern "system" fn Java_io_zbox_zboxfs_Path_jniJoin(
     env.new_string(new_path.to_str().unwrap())
         .unwrap()
         .into_inner()
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_zbox_zboxfs_Path_jniPush(
+    env: JNIEnv,
+    _cls: JClass,
+    path: JString,
+    other: JString,
+) -> jstring {
+    let path: String = env.get_string(path).unwrap().into();
+    let other: String = env.get_string(other).unwrap().into();
+    let mut path = PathBuf::from(&path);
+    path.push(&other);
+    env.new_string(path.to_str().unwrap()).unwrap().into_inner()
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_zbox_zboxfs_Path_jniPop(
+    env: JNIEnv,
+    _cls: JClass,
+    path: JString,
+) -> jstring {
+    let path: String = env.get_string(path).unwrap().into();
+    let mut path = PathBuf::from(&path);
+    path.pop();
+    env.new_string(path.to_str().unwrap()).unwrap().into_inner()
 }
 
 #[no_mangle]

@@ -48,29 +48,29 @@ import java.nio.ByteBuffer;
  * {@link Version}. There are two ways of writing data to a file:</p>
  *
  * <ul>
- *     <li>
- *         <h4>Multi-part Write</h4>
- *         <p>This is done by updating {@code File} using {@link #write(byte[])} method multiple
- *         times. After all writing operations, {@link #finish()} must be called to create a new
- *         {@link Version}.</p>
- *         <h5>Examples</h5>
- *         <blockquote><pre>
+ * <li>
+ * <h4>Multi-part Write</h4>
+ * <p>This is done by updating {@code File} using {@link #write(byte[])} method multiple
+ * times. After all writing operations, {@link #finish()} must be called to create a new
+ * {@link Version}.</p>
+ * <h5>Examples</h5>
+ * <blockquote><pre>
  *  File file = new OpenOptions().create(true).open(repo, "/foo.txt");
  *  long written = file.write("My text".getBytes());
  *  written = file.write("My text2".getBytes());
  *  file.finish();
  *         </pre></blockquote>
- *     </li>
- *     <li>
- *         <h4>Single-part Write</h4>
- *         <p>This can be done by calling {@link #writeOnce(ByteBuffer)}, which will call
- *         {@link #finish()} internally to create a new {@link Version}.</p>
- *         <h5>Examples</h5>
- *         <blockquote><pre>
+ * </li>
+ * <li>
+ * <h4>Single-part Write</h4>
+ * <p>This can be done by calling {@link #writeOnce(ByteBuffer)}, which will call
+ * {@link #finish()} internally to create a new {@link Version}.</p>
+ * <h5>Examples</h5>
+ * <blockquote><pre>
  *  File file = new OpenOptions().create(true).open(repo, "/foo.txt");
  *  file.writeOnce("My text".getBytes());
  *         </pre></blockquote>
- *     </li>
+ * </li>
  * </ul>
  *
  * <h3>Reading</h3>
@@ -260,6 +260,8 @@ public class File extends RustObject {
      * @throws ZboxException if any error happened
      */
     public int read(byte[] dst, int off, int len) throws ZboxException {
+        checkNullParam(dst);
+
         ByteBuffer buf;
 
         if (len > READ_BUF_CAP) {
@@ -347,6 +349,8 @@ public class File extends RustObject {
      * @throws ZboxException if any error happened
      */
     public int write(byte[] src, int off, int len) throws ZboxException {
+        checkNullParam(src);
+
         ByteBuffer buf;
 
         if (len > WRITE_BUF_CAP) {
@@ -443,7 +447,7 @@ public class File extends RustObject {
      * <p>A seek beyond the end of the file is allowed. In this case, subsequent write will extend
      * the file and have all of the intermediate data filled in with 0s.</p>
      *
-     * @param off the offset within this file, relative to {@code whence}
+     * @param off    the offset within this file, relative to {@code whence}
      * @param whence the start point to calculate seek offset
      * @return new position from the start of the content
      * @throws ZboxException if any error happened

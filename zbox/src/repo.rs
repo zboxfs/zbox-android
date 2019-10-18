@@ -357,13 +357,25 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniReadDir(
                 let name_str = env.new_string(ent.file_name()).unwrap();
                 let meta_obj = metadata_to_jobject(&env, ent.metadata());
 
+                let path_obj = env
+                    .new_object("io/zbox/zboxfs/Path", "()V", &[])
+                    .unwrap();
                 env.set_field(
-                    ent_obj,
+                    path_obj,
                     "path",
                     "Ljava/lang/String;",
                     JValue::Object(JObject::from(path_str)),
                 )
                 .unwrap();
+                env.set_field(
+                    ent_obj,
+                    "path",
+                    "Lio/zbox/zboxfs/Path;",
+                    JValue::Object(path_obj),
+                )
+                .unwrap();
+                env.delete_local_ref(path_obj).unwrap();
+
                 env.set_field(
                     ent_obj,
                     "fileName",
