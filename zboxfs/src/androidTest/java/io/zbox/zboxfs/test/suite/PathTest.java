@@ -36,7 +36,7 @@ public class PathTest {
 
     @Test
     public void validPath() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa");
         Path path3 = new Path("/aaa/bbb");
 
@@ -57,7 +57,7 @@ public class PathTest {
 
     @Test
     public void parent() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa");
         Path path3 = new Path("/aaa/bbb");
         Path parent = path.parent();
@@ -71,18 +71,22 @@ public class PathTest {
 
     @Test
     public void fileName() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa");
         Path path3 = new Path("/aaa/bbb");
+        Path path4 = new Path("/aaa/ccc.ext");
+        Path path5 = new Path("/aaa/eee/");
 
-        assertNull(path.fileName());
+        assertEquals(path.fileName(), "");
         assertEquals(path2.fileName(), "aaa");
         assertEquals(path3.fileName(), "bbb");
+        assertEquals(path4.fileName(), "ccc.ext");
+        assertEquals(path5.fileName(), "eee");
     }
 
     @Test
     public void stripPrefix() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
 
         assertEquals(path.stripPrefix("/"), "");
@@ -94,7 +98,7 @@ public class PathTest {
 
     @Test
     public void startsAndEndsWith() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
 
         assertTrue(path.startsWith("/"));
@@ -121,7 +125,7 @@ public class PathTest {
 
     @Test
     public void fileStemAndExtension() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
         Path path3 = new Path("/aaa/bbb/ddd.txt");
         Path path4 = new Path("/aaa/bbb/eee.fff.ext");
@@ -139,7 +143,7 @@ public class PathTest {
 
     @Test
     public void join() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
 
         assertTrue(path.join(null).equals("/"));
@@ -155,7 +159,7 @@ public class PathTest {
 
     @Test
     public void pushAndPop() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
 
         path.push(null);
@@ -166,12 +170,12 @@ public class PathTest {
         assertTrue(path.equals("/xxx"));
         path.push("yyy");
         assertTrue(path.equals("/xxx/yyy"));
+        path.push("/zzz");
+        assertTrue(path.equals("/zzz"));
 
         path2.push("xxx");
         assertTrue(path2.equals("/aaa/bbb/ccc/xxx"));
 
-        assertTrue(path.pop());
-        assertTrue(path.equals("/xxx"));
         assertTrue(path.pop());
         assertTrue(path.equals("/"));
         assertFalse(path.pop());
@@ -191,7 +195,7 @@ public class PathTest {
 
     @Test
     public void setFileName() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
         Path path3 = new Path("/aaa/bbb/ddd.txt");
         Path path4 = new Path("/aaa/bbb/eee.fff.ext");
@@ -219,7 +223,7 @@ public class PathTest {
 
     @Test
     public void setExtension() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
         Path path3 = new Path("/aaa/bbb/ddd.txt");
         Path path4 = new Path("/aaa/bbb/eee.fff.ext");
@@ -241,7 +245,7 @@ public class PathTest {
 
     @Test
     public void components() throws ZboxException {
-        Path path = new Path("/");
+        Path path = Path.root();
         Path path2 = new Path("/aaa/bbb/ccc");
         Path path3 = new Path("/aaa/bbb/ddd.txt");
         Path path4 = new Path("/aaa/bbb/eee.fff.ext");

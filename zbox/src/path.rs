@@ -53,12 +53,11 @@ pub extern "system" fn Java_io_zbox_zboxfs_Path_jniFileName(
     let path: String = env.get_string(path).unwrap().into();
     let path = Path::new(&path);
     match path.file_name() {
-        Some(file_name) => env
-            .new_string(file_name.to_str().unwrap())
-            .unwrap()
-            .into_inner(),
-        None => *JObject::null(),
+        Some(file_name) => env.new_string(file_name.to_str().unwrap()),
+        None => env.new_string(""),
     }
+    .unwrap()
+    .into_inner()
 }
 
 #[no_mangle]

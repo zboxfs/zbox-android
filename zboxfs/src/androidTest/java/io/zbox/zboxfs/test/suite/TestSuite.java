@@ -15,7 +15,13 @@ import java.security.SecureRandom;
 import io.zbox.zboxfs.Env;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ RepoTest.class, PersistTest.class, FileTest.class, DirTest.class, PathTest.class })
+@Suite.SuiteClasses({
+        RepoTest.class,
+        PersistTest.class,
+        FileTest.class,
+        DirTest.class,
+        PathTest.class
+})
 public class TestSuite {
     private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
     private static final String CHAR_UPPER = CHAR_LOWER.toUpperCase();
@@ -59,7 +65,7 @@ public class TestSuite {
     }
 
     public static String makeFileRepoUri() {
-         return "file://" + testDir + "/" + randomString();
+        return "file://" + testDir + "/" + randomString();
     }
 
     public static String makeMemRepoUri() {
