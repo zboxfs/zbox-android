@@ -202,7 +202,7 @@ public class Repo extends RustObject {
     }
 
     /**
-     * Attempts to open a file in read-only mode.
+     * Attempts to open a file in read-only mode at specified path.
      *
      * <p>{@code path} must be an absolute path.</p>
      *
@@ -210,10 +210,23 @@ public class Repo extends RustObject {
      * @return {@code File} instance opened
      * @throws ZboxException if any error happened
      * @see OpenOptions#open(Repo, Path)
+     * @see #openFileInputStream(Path)
      */
     public File openFile(Path path) throws ZboxException {
         checkNullParam(path);
         return this.jniOpenFile(path.toString());
+    }
+
+    /**
+     * Attempts to open a file input stream at specified path.
+     *
+     * @param path absolute path of the file to be opened
+     * @return {@code FileInputStream} instance opened
+     * @throws ZboxException if any error happened
+     * @see #openFile(Path)
+     */
+    public FileInputStream openFileInputStream(Path path) throws ZboxException {
+        return new FileInputStream(openFile(path));
     }
 
     /**

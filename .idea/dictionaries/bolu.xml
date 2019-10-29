@@ -2,6 +2,7 @@
   <dictionary name="bolu">
     <words>
       <w>bintray</w>
+      <w>dedup</w>
       <w>zbox</w>
       <w>zboxfs</w>
     </words>

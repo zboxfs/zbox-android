@@ -1,5 +1,7 @@
 package io.zbox.zboxfs;
 
+import java.io.Serializable;
+
 /**
  * This class represents an absolute location of file or directory in ZboxFS repository.
  *
@@ -7,7 +9,7 @@ package io.zbox.zboxfs;
  *
  * @author Bo Lu
  */
-public class Path implements Cloneable {
+public class Path implements Cloneable, Serializable {
 
     private String path;
 

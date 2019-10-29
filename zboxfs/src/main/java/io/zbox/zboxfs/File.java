@@ -1,5 +1,7 @@
 package io.zbox.zboxfs;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -413,6 +415,8 @@ public class File extends RustObject {
      * @param buf the source byte buffer from which bytes are to be read
      * @throws ZboxException if any error happened
      * @see #write(ByteBuffer)
+     * @see #writeOnce(byte[])
+     * @see #writeOnce(InputStream)
      */
     public void writeOnce(ByteBuffer buf) throws ZboxException {
         checkNullParam(buf);
@@ -429,6 +433,8 @@ public class File extends RustObject {
      * @param buf the source byte array from which bytes are to be read
      * @throws ZboxException if any error happened
      * @see #write(byte[])
+     * @see #writeOnce(ByteBuffer)
+     * @see #writeOnce(InputStream)
      */
     public void writeOnce(byte[] buf) throws ZboxException {
         checkNullParam(buf);
@@ -436,6 +442,32 @@ public class File extends RustObject {
         bytes.position(buf.length);
         ByteBuffer src = this.ensureDirectBuf(bytes);
         this.jniWriteOnce(src);
+    }
+
+    /**
+     * Single-part write to file and create a new version.
+     *
+     * @param stream the source input stream from which bytes are to be read
+     * @throws ZboxException if any error happened
+     * @see #write(byte[])
+     * @see #writeOnce(ByteBuffer)
+     * @see #writeOnce(byte[])
+     */
+    public void writeOnce(InputStream stream) throws ZboxException {
+        checkNullParam(stream);
+
+        byte[] buf = new byte[4096];
+        int read;
+
+        try {
+            while((read = stream.read(buf)) > 0){
+                this.write(buf, 0, read);
+            }
+        } catch (IOException err) {
+            throw new ZboxException(err.toString());
+        }
+
+        this.finish();
     }
 
     /**

@@ -23,6 +23,10 @@ abstract class RustObject implements AutoCloseable {
         }
     }
 
+    public boolean isClosed() {
+        return rustObj == 0;
+    }
+
     @Override
     protected void finalize() throws Throwable {
         this.close();
