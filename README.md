@@ -18,6 +18,10 @@ implementation 'io.zbox:zboxfs:0.1.1'
 
 Check the Java doc [reference documentation](https://docs.zbox.io/android).
 
+# Sample Android App
+
+[Treno] is a sample Android app using ZboxFS.
+
 # How to Build
 
 You need [Docker] and [JDK] to build this package.
@@ -60,3 +64,4 @@ file for details.
 [ZboxFS]: https://github.com/zboxfs/zbox
 [Docker]: https://www.docker.com/
 [JDK]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
+[Treno]: https://github.com/zboxfs/treno
