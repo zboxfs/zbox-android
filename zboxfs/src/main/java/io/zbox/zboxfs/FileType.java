@@ -39,5 +39,21 @@ public enum FileType {
     public int getValue() {
         return id;
     }
+
+    /**
+     * Indicate whether the other file type equals to this one.
+     *
+     * @param other the other file type
+     * @return {@code true} if the file type is same, {@code false} otherwise
+     */
+    public boolean equals(FileType other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null || other.getClass() != this.getClass()) {
+            return false;
+        }
+        return this.id == other.id;
+    }
 }
 

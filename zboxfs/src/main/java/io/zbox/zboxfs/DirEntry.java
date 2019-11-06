@@ -23,4 +23,22 @@ public class DirEntry {
      * the metadata for the file that this entry points at.
      */
     public Metadata metadata;
+
+    /**
+     * Indicate whether the other entry equals to this one.
+     *
+     * @param other the other entry
+     * @return {@code true} if the entry is same, {@code false} otherwise
+     */
+    public boolean equals(DirEntry other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null || other.getClass() != this.getClass()) {
+            return false;
+        }
+        return this.path.equals(other.path)
+                && this.fileName.equals(other.fileName)
+                && this.metadata.equals(other.metadata);
+    }
 }

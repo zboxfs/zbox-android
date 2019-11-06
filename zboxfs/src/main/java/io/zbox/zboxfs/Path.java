@@ -418,7 +418,7 @@ public class Path implements Cloneable, Serializable {
     }
 
     @Override
-    protected Path clone() throws CloneNotSupportedException {
+    public Path clone() throws CloneNotSupportedException {
         super.clone();
         Path ret = new Path();
         ret.path = this.path;

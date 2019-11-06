@@ -54,4 +54,24 @@ public class Metadata {
     public boolean isFile() {
         return this.fileType == FileType.FILE;
     }
+
+    /**
+     * Indicate whether the other metadata equals to this one.
+     *
+     * @param other the other metadata
+     * @return {@code true} if the metadata is same, {@code false} otherwise
+     */
+    public boolean equals(Metadata other) {
+        if (other == this) {
+            return true;
+        }
+        if (other == null || other.getClass() != this.getClass()) {
+            return false;
+        }
+        return this.fileType.equals(other.fileType)
+                && this.contentLen == other.contentLen
+                && this.currVersion == other.currVersion
+                && this.createdAt == other.createdAt
+                && this.modifiedAt == other.modifiedAt;
+    }
 }
