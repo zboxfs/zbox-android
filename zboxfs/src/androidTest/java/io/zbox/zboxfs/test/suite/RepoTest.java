@@ -28,6 +28,14 @@ public class RepoTest {
     public void before() {
     }
 
+    private void assertBufEquals(ByteBuffer dst, ByteBuffer src) {
+        ByteBuffer buf = dst.asReadOnlyBuffer();
+        buf.flip();
+        ByteBuffer buf2 = src.asReadOnlyBuffer();
+        buf2.flip();
+        assertEquals(buf, buf2);
+    }
+
     @Test
     public void versionString() {
         String ver = Env.version();
@@ -273,6 +281,50 @@ public class RepoTest {
     }
 
     @Test
+    public void copyDir() throws ZboxException {
+        Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
+        Path src = new Path("/src");
+        Path srcFile = new Path("/src/file");
+        Path srcDir2 = new Path("/src/dir/dir2");
+        Path tgt = new Path("/tgt");
+        Path tgtFile = new Path("/tgt/file");
+        Path tgtDir = new Path("/tgt/dir");
+        Path tgtDir2 = new Path("/tgt/dir/dir2");
+
+        repo.createDirAll(srcDir2);
+        File file = repo.createFile(srcFile);
+        ByteBuffer buf = ByteBuffer.allocateDirect(3);
+        buf.put((byte) 1);
+        buf.put((byte) 2);
+        buf.put((byte) 3);
+        file.writeOnce(buf);
+        file.close();
+
+        repo.copyDirAll(src, tgt);
+        assertTrue(repo.isDir(tgt));
+        assertTrue(repo.isDir(tgtDir));
+        assertTrue(repo.isDir(tgtDir2));
+        Metadata md = repo.metadata(tgtFile);
+        assertNotNull(md);
+        assertEquals(md.fileType, FileType.FILE);
+        assertTrue(md.isFile());
+        assertEquals(md.contentLen, 3);
+
+        // verify file content
+        file = repo.openFile(tgtFile);
+        ByteBuffer dst = file.readAll();
+        dst.rewind();
+        buf.rewind();
+        assertBufEquals(dst, buf);
+        file.close();
+
+        // copy dir to itself should success
+        repo.copyDirAll(src, src);
+
+        repo.close();
+    }
+
+    @Test
     public void removeFile() throws ZboxException {
         Repo repo = new RepoOpener().create(true).open(TestSuite.makeMemRepoUri(), "pwd");
         Path path = new Path("/file");
@@ -310,6 +362,12 @@ public class RepoTest {
         repo.rename(path, newName);
         assertFalse(repo.pathExists(path));
         assertTrue(repo.pathExists(newName));
+
+        // test move() method
+        Path newName2 = new Path("/new-name2");
+        repo.move(newName, newName2);
+        assertFalse(repo.pathExists(newName));
+        assertTrue(repo.pathExists(newName2));
     }
 
     @Test

@@ -18,5 +18,5 @@ lto = true
 jni = "0.13.1"
 log = "0.4.8"
 android_logger = "0.8.5"
-zbox = { version = "0.8.7", features = ["storage-file", "storage-zbox-android"] }
-#zbox = { path = "../../zbox", features = ["storage-file", "storage-zbox-android"] }
+#zbox = { version = "0.8.7", features = ["storage-file", "storage-zbox-android"] }
+zbox = { path = "../../zbox", features = ["storage-file", "storage-zbox-android"] }

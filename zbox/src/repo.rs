@@ -462,6 +462,23 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCopy(
 }
 
 #[no_mangle]
+pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCopyDirAll(
+    env: JNIEnv,
+    obj: JObject,
+    from: JString,
+    to: JString,
+) {
+    let mut repo = env
+        .get_rust_field::<&str, Repo>(obj, RUST_OBJ_FIELD)
+        .unwrap();
+    let from: String = env.get_string(from).unwrap().into();
+    let to: String = env.get_string(to).unwrap().into();
+    if let Err(ref err) = repo.copy_dir_all(&from, &to) {
+        throw(&env, err);
+    }
+}
+
+#[no_mangle]
 pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRemoveFile(
     env: JNIEnv,
     obj: JObject,

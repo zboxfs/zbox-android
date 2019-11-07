@@ -302,11 +302,11 @@ public class Repo extends RustObject {
     /**
      * Copies the content of one file to another.
      *
-     * <p>This method will overwrite the content of {@code to}.</p>
-     *
-     * <p>If {@code from} and {@code to} both point to the same file, this method is no-op.</p>
+     * <p>This method will <b>overwrite</b> the content of {@code to}.</p>
      *
      * <p>{@code from} and {@code to} must be absolute paths to regular files.</p>
+     *
+     * <p>If {@code from} and {@code to} both point to the same file, this method is no-op.</p>
      *
      * @param from absolute path of the source regular file
      * @param to   absolute path of the target regular file
@@ -315,6 +315,30 @@ public class Repo extends RustObject {
     public void copy(Path from, Path to) throws ZboxException {
         checkNullParam2(from, to);
         this.jniCopy(from.toString(), to.toString());
+    }
+
+    /**
+     * Copies a directory to another recursively.
+     *
+     * <p>This method will <b>overwrite</b> the content of files in {@code to} with the files in
+     * {@code from} which have same relative location.</p>
+     *
+     * <p>{@code from} and {@code to} must be absolute paths to regular files.</p>
+     *
+     * <p>If {@code to} is not empty, the entire directory tree of {@code from} will be merged to
+     * {@code to}.</p>
+     *
+     * <p>This method will stop if any errors happened.</p>
+     *
+     * <p>If {@code from} and {@code to} both point to the same file, this method is no-op.</p>
+     *
+     * @param from absolute path of the source directory
+     * @param to   absolute path of the target directory
+     * @throws ZboxException if any error happened
+     */
+    public void copyDirAll(Path from, Path to) throws ZboxException {
+        checkNullParam2(from, to);
+        this.jniCopyDirAll(from.toString(), to.toString());
     }
 
     /**
@@ -370,6 +394,19 @@ public class Repo extends RustObject {
         this.jniRename(from.toString(), to.toString());
     }
 
+    /**
+     * Move a file or directory to a new location, replacing the original file if to already exists.
+     *
+     * This method is the same as {@link #rename(Path, Path)}.
+     *
+     * @param from absolute path of the source regular file
+     * @param to   absolute path of the target regular file
+     * @throws ZboxException if any error happened
+     */
+    public void move(Path from, Path to) throws ZboxException {
+        this.rename(from, to);
+    }
+
     // jni methods
     private native static boolean jniExists(String uri) throws ZboxException;
 
@@ -401,6 +438,8 @@ public class Repo extends RustObject {
     private native Version[] jniHistory(String path) throws ZboxException;
 
     private native void jniCopy(String from, String to) throws ZboxException;
+
+    private native void jniCopyDirAll(String from, String to) throws ZboxException;
 
     private native void jniRemoveFile(String path) throws ZboxException;
 
