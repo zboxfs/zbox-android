@@ -2,6 +2,7 @@ package io.zbox.zboxfs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -143,11 +144,11 @@ public class File extends RustObject {
     private static final int rustObjId = 103;
 
     // read buffer
-    private static final int READ_BUF_CAP = 16 * 1024;
+    private static final int READ_BUF_CAP = 8 * 1024;
     private ByteBuffer readBuf = ByteBuffer.allocateDirect(READ_BUF_CAP);
 
     // write buffer, lazily allocated
-    private static final int WRITE_BUF_CAP = 16 * 1024;
+    private static final int WRITE_BUF_CAP = 8 * 1024;
     private ByteBuffer writeBuf = null;
 
     private File() {
@@ -214,7 +215,8 @@ public class File extends RustObject {
     }
 
     /**
-     * Pull some bytes from this file into the specified buffer, returning how many bytes were read.
+     * Pull all bytes from this file into the specified byte buffer, returning how many bytes were
+     * read.
      *
      * <p>The bytes are appended to the destination buffer {@code dst}. That is, the writing starts
      * from the current position in {@code dst}.</p>
@@ -225,6 +227,7 @@ public class File extends RustObject {
      * @param dst the byte buffer into which bytes are to be written
      * @return number of bytes were read
      * @throws ZboxException if any error happened
+     * @see #read(OutputStream)
      * @see #readAll()
      */
     public long read(ByteBuffer dst) throws ZboxException {
@@ -250,7 +253,7 @@ public class File extends RustObject {
      * <p>This method copies {@code n} bytes from this file into the given destination array. If
      * there is no exception thrown, then it must be guaranteed that {@code 0 <= n <= len}.</p>
      *
-     * <p>It is recommended to make {@code len} less than 16KB (16384) to avoid extra memory
+     * <p>It is recommended to make {@code len} less than 8KB (8192) to avoid extra memory
      * allocation.</p>
      *
      * @param dst the array into which bytes are to be written
@@ -294,7 +297,7 @@ public class File extends RustObject {
      * file.read(dst, 0, dst.length)
      * </pre></blockquote>
      *
-     * <p>It is recommended to make {@code dst.length} less than 16KB (16384) to avoid extra memory
+     * <p>It is recommended to make {@code dst.length} less than 8KB (8192) to avoid extra memory
      * allocation.</p>
      *
      * @param dst the array into which bytes are to be written
@@ -303,6 +306,35 @@ public class File extends RustObject {
      */
     public int read(byte[] dst) throws ZboxException {
         return this.read(dst, 0, dst.length);
+    }
+
+    /**
+     * Pull all bytes from this file into the specified output stream, returning how many bytes were
+     * read.
+     *
+     * @param dst the output stream into which bytes are to be written
+     * @return number of bytes were read
+     * @throws ZboxException if any error happened
+     * @see #read(ByteBuffer)
+     * @see #readAll()
+     */
+    public long read(OutputStream dst) throws ZboxException {
+        checkNullParam(dst);
+
+        byte[] buf = new byte[8192];
+        int read = 0;
+        long total = 0;
+
+        try {
+            while ((read = this.read(buf)) > 0) {
+                dst.write(buf, 0, read);
+                total += read;
+            }
+        } catch (IOException err) {
+            throw new ZboxException(err.toString());
+        }
+
+        return total;
     }
 
     /**
@@ -339,7 +371,7 @@ public class File extends RustObject {
      * <p>This method copies {@code n} bytes from the given source array into this file. If there is
      * no exception thrown, then it must be guaranteed that {@code 0 <= n <= len}.</p>
      *
-     * <p>It is recommended to make {@code len} less than 16KB (16384) to avoid extra memory
+     * <p>It is recommended to make {@code len} less than 8KB (8192) to avoid extra memory
      * allocation.</p>
      *
      * @param src the source array from which bytes are to be read
@@ -382,7 +414,7 @@ public class File extends RustObject {
      * file.write(src, 0, src.length)
      * </pre></blockquote>
      *
-     * <p>It is recommended to make {@code src.length} less than 16KB (16384) to avoid extra memory
+     * <p>It is recommended to make {@code src.length} less than 8KB (8192) to avoid extra memory
      * allocation.</p>
      *
      * @param src the source array from which bytes are to be read
@@ -445,7 +477,7 @@ public class File extends RustObject {
     }
 
     /**
-     * Single-part write to file and create a new version.
+     * Single-part write to file using an input stream and create a new version.
      *
      * @param stream the source input stream from which bytes are to be read
      * @throws ZboxException if any error happened

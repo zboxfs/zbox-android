@@ -236,7 +236,7 @@ public class Path implements Cloneable, Serializable {
     }
 
     /***
-     * Extracts the extension of from file name of this path, if possible.
+     * Extracts the extension of from file name of this path without the leading '.', if possible.
      *
      * <blockquote><pre>
      * Path path = new Path("/");
