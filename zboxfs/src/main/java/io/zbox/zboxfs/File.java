@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A reference to an opened file in the repository.
@@ -351,6 +353,19 @@ public class File extends RustObject {
     }
 
     /**
+     * Read whole file content as a string until end of the file.
+     *
+     * @return the string holds all read bytes
+     * @throws ZboxException if any error happened
+     * @see #readAll()
+     */
+    public String readAllString() throws ZboxException {
+        ByteBuffer buf = readAll();
+        buf.flip();
+        return StandardCharsets.UTF_8.decode(buf).toString();
+    }
+
+    /**
      * Write a buffer into this file, returning how many bytes were written.
      *
      * @param buf the source byte buffer from which bytes are to be read
@@ -474,6 +489,21 @@ public class File extends RustObject {
         bytes.position(buf.length);
         ByteBuffer src = this.ensureDirectBuf(bytes);
         this.jniWriteOnce(src);
+    }
+
+    /**
+     * Single-part write string to file and create a new version.
+     *
+     * @param str the string from which bytes are to be read
+     * @throws ZboxException if any error happened
+     * @see #write(byte[])
+     * @see #writeOnce(ByteBuffer)
+     * @see #writeOnce(byte[])
+     * @see #writeOnce(InputStream)
+     */
+    public void writeOnce(String str) throws ZboxException {
+        checkNullParam(str);
+        writeOnce(str.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
