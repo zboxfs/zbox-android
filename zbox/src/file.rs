@@ -153,7 +153,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniReadAll<'a>(
         .unwrap();
 
     // get file content length
-    let len = match file.metadata() {
+    let content_len = match file.metadata() {
         Ok(md) => md.content_len(),
         Err(ref err) => {
             let ret = JObject::null();
@@ -161,6 +161,19 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniReadAll<'a>(
             return JByteBuffer::from(ret);
         }
     };
+
+    // get current position of file
+    let curr_pos = match file.seek(SeekFrom::Current(0)) {
+        Ok(pos) => pos as usize,
+        Err(ref err) => {
+            let ret = JObject::null();
+            throw(&env, err);
+            return JByteBuffer::from(ret);
+        }
+    };
+
+    // calculate direct buffer length needed
+    let len = if content_len > curr_pos { content_len - curr_pos } else { 0 };
 
     // allocate a direct byte buffer on Java side, this is to let JVM to handle
     // buffer release
@@ -176,16 +189,6 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniReadAll<'a>(
         .unwrap();
     let buf = JByteBuffer::from(buf_obj);
     let dst = env.get_direct_buffer_address(buf).unwrap();
-
-    // seek to beginning of file
-    match file.seek(SeekFrom::Start(0)) {
-        Ok(_) => {}
-        Err(ref err) => {
-            let ret = JObject::null();
-            throw(&env, err);
-            return JByteBuffer::from(ret);
-        }
-    }
 
     // read file content to direct byte buffer
     let mut offset = 0;

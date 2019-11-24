@@ -1,6 +1,6 @@
-use std::io::{Read, Seek};
+use std::io::{Read, Seek, SeekFrom};
 
-use jni::objects::{JByteBuffer, JObject};
+use jni::objects::{JByteBuffer, JObject, JValue};
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
 
@@ -35,11 +35,73 @@ pub extern "system" fn Java_io_zbox_zboxfs_VersionReader_jniReadAll<'a>(
     let mut rdr = env
         .get_rust_field::<&str, VersionReader>(obj, RUST_OBJ_FIELD)
         .unwrap();
-    let mut dst = Vec::new();
-    if let Err(ref err) = rdr.read_to_end(&mut dst) {
-        throw(&env, err);
+
+    // get file content length
+    let content_len = match rdr.version() {
+        Ok(ver) => ver.content_len(),
+        Err(ref err) => {
+            let ret = JObject::null();
+            throw(&env, err);
+            return JByteBuffer::from(ret);
+        }
+    };
+
+    // get current position of file
+    let curr_pos = match rdr.seek(SeekFrom::Current(0)) {
+        Ok(pos) => pos as usize,
+        Err(ref err) => {
+            let ret = JObject::null();
+            throw(&env, err);
+            return JByteBuffer::from(ret);
+        }
+    };
+
+    // calculate direct buffer length needed
+    let len = if content_len > curr_pos { content_len - curr_pos } else { 0 };
+
+    // allocate a direct byte buffer on Java side, this is to let JVM to handle
+    // buffer release
+    let buf_obj = env
+        .call_static_method(
+            "java/nio/ByteBuffer",
+            "allocateDirect",
+            "(I)Ljava/nio/ByteBuffer;",
+            &[JValue::from(len as i32)],
+        )
+        .unwrap()
+        .l()
+        .unwrap();
+    let buf = JByteBuffer::from(buf_obj);
+    let dst = env.get_direct_buffer_address(buf).unwrap();
+
+    // read file content to direct byte buffer
+    let mut offset = 0;
+    loop {
+        match rdr.read(&mut dst[offset..]) {
+            Ok(read) => {
+                if read == 0 {
+                    break;
+                }
+                offset += read;
+            }
+            Err(ref err) => {
+                let ret = JObject::null();
+                throw(&env, err);
+                return JByteBuffer::from(ret);
+            }
+        }
     }
-    env.new_direct_byte_buffer(&mut dst).unwrap()
+
+    // set direct buffer limit
+    env.call_method(
+        *buf,
+        "limit",
+        "(I)Ljava/nio/Buffer;",
+        &[JValue::from(offset as i32)],
+    )
+    .unwrap();
+
+    buf
 }
 
 #[no_mangle]

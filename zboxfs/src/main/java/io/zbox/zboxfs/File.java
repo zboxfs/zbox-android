@@ -345,6 +345,7 @@ public class File extends RustObject {
      * @return the byte buffer holds all read bytes
      * @throws ZboxException if any error happened
      * @see #read(ByteBuffer)
+     * @see #readAllString()
      */
     public ByteBuffer readAll() throws ZboxException {
         ByteBuffer ret = this.jniReadAll();

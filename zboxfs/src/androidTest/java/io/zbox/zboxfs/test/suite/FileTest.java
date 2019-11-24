@@ -328,7 +328,7 @@ public class FileTest {
         Path path = new Path("/file10");
         File file = new OpenOptions().create(true).open(this.repo, path);
 
-        String str = "some";
+        String str = "some text";
 
         // write to file
         file.writeOnce(str);
@@ -373,7 +373,7 @@ public class FileTest {
         file.writeOnce(this.buf2);
         file.close();
 
-        file = repo.openFile(path);
+        file = new OpenOptions().write(true).open(this.repo, path);
         long ver = file.currVersion();
         assertEquals(ver, 3);
         Version[] hist = file.history();
@@ -432,6 +432,13 @@ public class FileTest {
         assertEquals(dst3[1], buf.get());
         assertEquals(dst3[2], buf.get());
         vr.close();
+
+        // test write string, write version #3
+        String str = "some text";
+        file.writeOnce(str);
+        vr = file.versionReader(4);
+        String dst4 = vr.readAllString();
+        assertEquals(dst4, str);
 
         file.close();
     }

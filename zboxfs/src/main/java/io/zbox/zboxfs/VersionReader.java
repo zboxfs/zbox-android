@@ -1,6 +1,7 @@
 package io.zbox.zboxfs;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A reader for a specific version of file content.
@@ -155,11 +156,25 @@ public class VersionReader extends RustObject {
      * @return the byte buffer holds all read bytes
      * @throws ZboxException if any error happened
      * @see #read(ByteBuffer)
+     * @see #readAllString()
      */
     public ByteBuffer readAll() throws ZboxException {
         ByteBuffer ret = this.jniReadAll();
         ret.position(ret.limit());
         return ret;
+    }
+
+    /**
+     * Read whole content as a string until end of the version reader.
+     *
+     * @return the string holds all read bytes
+     * @throws ZboxException if any error happened
+     * @see #readAll()
+     */
+    public String readAllString() throws ZboxException {
+        ByteBuffer buf = readAll();
+        buf.flip();
+        return StandardCharsets.UTF_8.decode(buf).toString();
     }
 
     /**
