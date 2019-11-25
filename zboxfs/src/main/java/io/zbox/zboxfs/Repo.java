@@ -407,6 +407,20 @@ public class Repo extends RustObject {
         this.rename(from, to);
     }
 
+    /**
+     * Permanently destroy a repository specified by {@code uri}.
+     *
+     * <p>This will permanently delete all files and directories in a repository regardless it is
+     * opened or not. Use it with caution.</p>
+     *
+     * @param uri repository URI
+     * @throws ZboxException if any error happened
+     */
+    public static void destroy(String uri) throws ZboxException {
+        checkNullParam(uri);
+        jniDestroy(uri);
+    }
+
     // jni methods
     private native static boolean jniExists(String uri) throws ZboxException;
 
@@ -448,4 +462,6 @@ public class Repo extends RustObject {
     private native void jniRemoveDirAll(String path) throws ZboxException;
 
     private native void jniRename(String from, String to) throws ZboxException;
+
+    private static native void jniDestroy(String uri) throws ZboxException;
 }

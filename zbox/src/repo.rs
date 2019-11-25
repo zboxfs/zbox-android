@@ -539,3 +539,15 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRename(
         throw(&env, err);
     }
 }
+
+#[no_mangle]
+pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniDestroy(
+    env: JNIEnv,
+    _obj: JObject,
+    uri: JString,
+) {
+    let uri: String = env.get_string(uri).unwrap().into();
+    if let Err(ref err) = Repo::destroy(&uri) {
+        throw(&env, err);
+    }
+}

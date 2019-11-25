@@ -379,4 +379,14 @@ public class RepoTest {
         Repo.repairSuperBlock(uri, pwd);
     }
 
+    @Test(expected = ZboxException.class)
+    public void destroyRepo() throws ZboxException {
+        String uri = TestSuite.makeFileRepoUri();
+        String pwd = "pwd";
+        Repo repo = new RepoOpener().create(true).open(uri, pwd);
+        repo.close();
+        Repo.destroy(uri);
+        new RepoOpener().create(false).open(uri, pwd);
+    }
+
 }
