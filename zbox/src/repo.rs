@@ -18,7 +18,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniExists(
     let uri: String = env.get_string(uri).unwrap().into();
     match Repo::exists(&uri) {
         Ok(ret) => ret as u8,
-        Err(ref err) => {
+        Err(err) => {
             let ret = JNI_FALSE;
             throw(&env, err);
             ret
@@ -36,7 +36,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniInfo<'a>(
         .unwrap();
 
     let info = repo.info();
-    if let Err(ref err) = info {
+    if let Err(err) = info {
         let ret = JObject::null();
         throw(&env, err);
         return ret;
@@ -166,7 +166,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniResetPassword(
         .unwrap();
     let old_pwd: String = env.get_string(old_pwd).unwrap().into();
     let new_pwd: String = env.get_string(new_pwd).unwrap().into();
-    if let Err(ref err) = repo.reset_password(
+    if let Err(err) = repo.reset_password(
         &old_pwd,
         &new_pwd,
         OpsLimit::from(ops_limit),
@@ -185,7 +185,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRepairSuperBlock(
 ) {
     let uri: String = env.get_string(uri).unwrap().into();
     let pwd: String = env.get_string(pwd).unwrap().into();
-    if let Err(ref err) = Repo::repair_super_block(&uri, &pwd) {
+    if let Err(err) = Repo::repair_super_block(&uri, &pwd) {
         throw(&env, err);
     }
 }
@@ -202,7 +202,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniPathExists(
     let path: String = env.get_string(path).unwrap().into();
     match repo.path_exists(&path) {
         Ok(result) => result as u8,
-        Err(ref err) => {
+        Err(err) => {
             throw(&env, err);
             0
         }
@@ -221,7 +221,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniIsFile(
     let path: String = env.get_string(path).unwrap().into();
     match repo.is_file(&path) {
         Ok(result) => result as u8,
-        Err(ref err) => {
+        Err(err) => {
             throw(&env, err);
             0
         }
@@ -240,7 +240,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniIsDir(
     let path: String = env.get_string(path).unwrap().into();
     match repo.is_dir(&path) {
         Ok(result) => result as u8,
-        Err(ref err) => {
+        Err(err) => {
             throw(&env, err);
             0
         }
@@ -265,7 +265,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCreateFile<'a>(
             env.set_rust_field(file_obj, RUST_OBJ_FIELD, file).unwrap();
             file_obj
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret
@@ -290,7 +290,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniOpenFile<'a>(
             env.set_rust_field(file_obj, RUST_OBJ_FIELD, file).unwrap();
             file_obj
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret
@@ -308,7 +308,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCreateDir(
         .get_rust_field::<&str, Repo>(obj, RUST_OBJ_FIELD)
         .unwrap();
     let path: String = env.get_string(path).unwrap().into();
-    if let Err(ref err) = repo.create_dir(&path) {
+    if let Err(err) = repo.create_dir(&path) {
         throw(&env, err);
     }
 }
@@ -323,7 +323,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCreateDirAll(
         .get_rust_field::<&str, Repo>(obj, RUST_OBJ_FIELD)
         .unwrap();
     let path: String = env.get_string(path).unwrap().into();
-    if let Err(ref err) = repo.create_dir_all(&path) {
+    if let Err(err) = repo.create_dir_all(&path) {
         throw(&env, err);
     }
 }
@@ -401,7 +401,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniReadDir(
 
             objs
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = env
                 .new_object_array(0, "io/zbox/zboxfs/DirEntry", JObject::null())
                 .unwrap();
@@ -423,7 +423,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniMetadata<'a>(
     let path: String = env.get_string(path).unwrap().into();
     match repo.metadata(&path) {
         Ok(meta) => metadata_to_jobject(&env, meta),
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret
@@ -456,7 +456,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCopy(
         .unwrap();
     let from: String = env.get_string(from).unwrap().into();
     let to: String = env.get_string(to).unwrap().into();
-    if let Err(ref err) = repo.copy(&from, &to) {
+    if let Err(err) = repo.copy(&from, &to) {
         throw(&env, err);
     }
 }
@@ -473,7 +473,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniCopyDirAll(
         .unwrap();
     let from: String = env.get_string(from).unwrap().into();
     let to: String = env.get_string(to).unwrap().into();
-    if let Err(ref err) = repo.copy_dir_all(&from, &to) {
+    if let Err(err) = repo.copy_dir_all(&from, &to) {
         throw(&env, err);
     }
 }
@@ -488,7 +488,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRemoveFile(
         .get_rust_field::<&str, Repo>(obj, RUST_OBJ_FIELD)
         .unwrap();
     let path: String = env.get_string(path).unwrap().into();
-    if let Err(ref err) = repo.remove_file(&path) {
+    if let Err(err) = repo.remove_file(&path) {
         throw(&env, err);
     }
 }
@@ -503,7 +503,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRemoveDir(
         .get_rust_field::<&str, Repo>(obj, RUST_OBJ_FIELD)
         .unwrap();
     let path: String = env.get_string(path).unwrap().into();
-    if let Err(ref err) = repo.remove_dir(&path) {
+    if let Err(err) = repo.remove_dir(&path) {
         throw(&env, err);
     }
 }
@@ -518,7 +518,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRemoveDirAll(
         .get_rust_field::<&str, Repo>(obj, RUST_OBJ_FIELD)
         .unwrap();
     let path: String = env.get_string(path).unwrap().into();
-    if let Err(ref err) = repo.remove_dir_all(&path) {
+    if let Err(err) = repo.remove_dir_all(&path) {
         throw(&env, err);
     }
 }
@@ -535,7 +535,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniRename(
         .unwrap();
     let from: String = env.get_string(from).unwrap().into();
     let to: String = env.get_string(to).unwrap().into();
-    if let Err(ref err) = repo.rename(&from, &to) {
+    if let Err(err) = repo.rename(&from, &to) {
         throw(&env, err);
     }
 }
@@ -547,7 +547,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Repo_jniDestroy(
     uri: JString,
 ) {
     let uri: String = env.get_string(uri).unwrap().into();
-    if let Err(ref err) = Repo::destroy(&uri) {
+    if let Err(err) = Repo::destroy(&uri) {
         throw(&env, err);
     }
 }

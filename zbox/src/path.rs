@@ -15,12 +15,12 @@ pub extern "system" fn Java_io_zbox_zboxfs_Path_jniValidate(
     path: JString,
 ) {
     if path.is_null() {
-        throw(&env, &Error::InvalidPath);
+        throw(&env, Error::InvalidPath);
         return;
     }
     let path: String = env.get_string(path).unwrap().into();
     if !Path::new(&path).has_root() {
-        throw(&env, &Error::InvalidPath);
+        throw(&env, Error::InvalidPath);
     }
 }
 
@@ -33,7 +33,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_Path_jniParent(
     let path: String = env.get_string(path).unwrap().into();
     let path = Path::new(&path);
     if !path.has_root() {
-        throw(&env, &Error::InvalidPath);
+        throw(&env, Error::InvalidPath);
         return env.new_string(String::new()).unwrap().into_inner();
     }
     match path.parent() {

@@ -18,12 +18,12 @@ use std::error::Error as StdError;
 use std::io::SeekFrom;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use jni::objects::{JObject, JString, JValue};
+use jni::objects::{JObject, JString, JThrowable, JValue};
 use jni::sys::{jint, jobjectArray};
 use jni::JNIEnv;
 
 use zbox::{
-    File, Metadata, OpenOptions, Repo, RepoOpener, Result, Version,
+    Error, File, Metadata, OpenOptions, Repo, RepoOpener, Result, Version,
     VersionReader,
 };
 
@@ -69,6 +69,36 @@ fn to_seek_from(offset: i64, whence: jint) -> SeekFrom {
         2 => SeekFrom::End(offset),
         _ => unimplemented!(),
     }
+}
+
+fn throw(env: &JNIEnv, err: Error) {
+    let msg = if env.exception_check().unwrap() {
+        // get exception on java side and re-throw it with its message
+        let exception = env.exception_occurred().unwrap();
+        env.exception_describe().unwrap();
+        env.exception_clear().unwrap();
+        let jval = env
+            .call_method(*exception, "toString", "()Ljava/lang/String;", &[])
+            .unwrap();
+        let msg = JString::from(jval.l().unwrap());
+        env.get_string(msg).unwrap().into()
+    } else {
+        err.description().to_string()
+    };
+
+    let err_no = err.into();
+    let msg_obj = env.new_string(format!("{} ({})", msg, err_no)).unwrap();
+
+    // throw customised exception object with error code
+    let ex_obj = JThrowable::from(
+        env.new_object(
+            "io/zbox/zboxfs/ZboxException",
+            "(ILjava/lang/String;)V",
+            &[JValue::Int(err_no), JValue::Object(*msg_obj)],
+        )
+        .unwrap(),
+    );
+    let _ = env.throw(ex_obj);
 }
 
 fn metadata_to_jobject<'a>(env: &JNIEnv<'a>, meta: Metadata) -> JObject<'a> {
@@ -173,7 +203,7 @@ fn versions_to_jobjects(
 
             objs
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = env
                 .new_object_array(0, "io/zbox/zboxfs/Version", JObject::null())
                 .unwrap();
@@ -181,25 +211,6 @@ fn versions_to_jobjects(
             ret
         }
     }
-}
-
-fn throw(env: &JNIEnv, err: &StdError) {
-    if !env.exception_check().unwrap() {
-        let _ =
-            env.throw_new("io/zbox/zboxfs/ZboxException", err.description());
-        return;
-    }
-
-    // get java exception and re-throw it with its message
-    let exception = env.exception_occurred().unwrap();
-    env.exception_describe().unwrap();
-    env.exception_clear().unwrap();
-    let jval = env
-        .call_method(*exception, "toString", "()Ljava/lang/String;", &[])
-        .unwrap();
-    let msg = JString::from(jval.l().unwrap());
-    let msg: String = env.get_string(msg).unwrap().into();
-    let _ = env.throw_new("io/zbox/zboxfs/ZboxException", msg);
 }
 
 #[no_mangle]

@@ -146,7 +146,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_RepoOpener_jniOpen<'a>(
             env.set_rust_field(repo_obj, RUST_OBJ_FIELD, repo).unwrap();
             repo_obj
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret

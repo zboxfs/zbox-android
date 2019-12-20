@@ -76,7 +76,9 @@ public class FileTest {
     public void emptyFileIO() throws ZboxException {
         Path path = new Path("/file01");
         File file = new OpenOptions().create(true).open(this.repo, path);
+        assertFalse(file.isClosed());
         file.close();
+        assertTrue(file.isClosed());
 
         this.dst.clear();
         file = repo.openFile(path);

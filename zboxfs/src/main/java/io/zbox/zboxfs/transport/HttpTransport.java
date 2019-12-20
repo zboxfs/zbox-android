@@ -73,6 +73,7 @@ class HttpTransport {
                     totalRead += read;
                     read = in.read(buf, totalRead, buf.length - totalRead);
                 }
+                in.close();
 
                 ret.body = buf;
                 ret.len = totalRead;
@@ -108,6 +109,7 @@ class HttpTransport {
             // write body
             OutputStream out = conn.getOutputStream();
             out.write(body);
+            out.close();
 
             // send request and get response status code
             ret.status = conn.getResponseCode();
@@ -138,6 +140,41 @@ class HttpTransport {
 
             // set HTTP headers
             setHeaders(conn, headers);
+
+            // send request and get response status code
+            ret.status = conn.getResponseCode();
+
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+        return ret;
+    }
+
+    public static Response delete_bulk(URL url, HashMap<String, String> headers, byte[] body) throws IOException {
+        HttpsURLConnection conn = null;
+        Response ret = new Response();
+
+        try {
+            // create connection
+            conn = (HttpsURLConnection) url.openConnection();
+
+            // set connection properties
+            conn.setRequestMethod("DELETE");
+            conn.setConnectTimeout(timeout);
+            conn.setUseCaches(false);
+            conn.setDoOutput(true);
+            conn.setDoInput(false);
+
+            // set HTTP headers
+            setHeaders(conn, headers);
+
+            // write body
+            OutputStream out = conn.getOutputStream();
+            out.write(body);
+            out.close();
 
             // send request and get response status code
             ret.status = conn.getResponseCode();

@@ -4,7 +4,7 @@ use jni::objects::{JByteBuffer, JObject, JValue};
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
 
-use zbox::VersionReader;
+use zbox::{Error, VersionReader};
 
 use super::{throw, to_seek_from, RUST_OBJ_FIELD};
 
@@ -20,8 +20,8 @@ pub extern "system" fn Java_io_zbox_zboxfs_VersionReader_jniRead(
     let dst = env.get_direct_buffer_address(dst).unwrap();
     match rdr.read(dst) {
         Ok(read) => read as i64,
-        Err(ref err) => {
-            throw(&env, err);
+        Err(err) => {
+            throw(&env, Error::from(err));
             0
         }
     }
@@ -39,7 +39,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_VersionReader_jniReadAll<'a>(
     // get file content length
     let content_len = match rdr.version() {
         Ok(ver) => ver.content_len(),
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             return JByteBuffer::from(ret);
@@ -49,15 +49,19 @@ pub extern "system" fn Java_io_zbox_zboxfs_VersionReader_jniReadAll<'a>(
     // get current position of file
     let curr_pos = match rdr.seek(SeekFrom::Current(0)) {
         Ok(pos) => pos as usize,
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
-            throw(&env, err);
+            throw(&env, Error::from(err));
             return JByteBuffer::from(ret);
         }
     };
 
     // calculate direct buffer length needed
-    let len = if content_len > curr_pos { content_len - curr_pos } else { 0 };
+    let len = if content_len > curr_pos {
+        content_len - curr_pos
+    } else {
+        0
+    };
 
     // allocate a direct byte buffer on Java side, this is to let JVM to handle
     // buffer release
@@ -84,9 +88,9 @@ pub extern "system" fn Java_io_zbox_zboxfs_VersionReader_jniReadAll<'a>(
                 }
                 offset += read;
             }
-            Err(ref err) => {
+            Err(err) => {
                 let ret = JObject::null();
-                throw(&env, err);
+                throw(&env, Error::from(err));
                 return JByteBuffer::from(ret);
             }
         }
@@ -117,8 +121,8 @@ pub extern "system" fn Java_io_zbox_zboxfs_VersionReader_jniSeek(
     let whence = to_seek_from(offset, whence);
     match rdr.seek(whence) {
         Ok(pos) => pos as i64,
-        Err(ref err) => {
-            throw(&env, err);
+        Err(err) => {
+            throw(&env, Error::from(err));
             0
         }
     }

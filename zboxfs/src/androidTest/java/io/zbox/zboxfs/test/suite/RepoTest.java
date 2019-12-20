@@ -389,4 +389,12 @@ public class RepoTest {
         new RepoOpener().create(false).open(uri, pwd);
     }
 
+    @Test
+    public void testErrorId() {
+        try {
+            new RepoOpener().create(true).open("wrong uri", "");
+        } catch (ZboxException err) {
+            assertEquals(err.getErrorCode(), ZboxException.ERR_INVALID_URI);
+        }
+    }
 }

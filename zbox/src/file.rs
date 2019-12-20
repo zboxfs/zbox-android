@@ -4,7 +4,7 @@ use jni::objects::{JByteBuffer, JObject, JValue};
 use jni::sys::{jint, jlong, jobjectArray};
 use jni::JNIEnv;
 
-use zbox::File;
+use zbox::{Error, File};
 
 use super::{
     metadata_to_jobject, throw, to_seek_from, versions_to_jobjects,
@@ -21,7 +21,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniMetadata<'a>(
         .unwrap();
     match file.metadata() {
         Ok(meta) => metadata_to_jobject(&env, meta),
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret
@@ -50,7 +50,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniCurrVersion(
         .unwrap();
     match file.curr_version() {
         Ok(ver) => ver as i64,
-        Err(ref err) => {
+        Err(err) => {
             throw(&env, err);
             0
         }
@@ -74,7 +74,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniVersionReader<'a>(
             env.set_rust_field(rdr_obj, RUST_OBJ_FIELD, rdr).unwrap();
             rdr_obj
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret
@@ -90,7 +90,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniFinish(
     let mut file = env
         .get_rust_field::<&str, File>(obj, RUST_OBJ_FIELD)
         .unwrap();
-    if let Err(ref err) = file.finish() {
+    if let Err(err) = file.finish() {
         throw(&env, err);
     }
 }
@@ -105,7 +105,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniWriteOnce(
         .get_rust_field::<&str, File>(obj, RUST_OBJ_FIELD)
         .unwrap();
     let buf = env.get_direct_buffer_address(buf).unwrap();
-    if let Err(ref err) = file.write_once(buf) {
+    if let Err(err) = file.write_once(buf) {
         throw(&env, err);
     }
 }
@@ -119,7 +119,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniSetLen(
     let mut file = env
         .get_rust_field::<&str, File>(obj, RUST_OBJ_FIELD)
         .unwrap();
-    if let Err(ref err) = file.set_len(len as usize) {
+    if let Err(err) = file.set_len(len as usize) {
         throw(&env, err);
     }
 }
@@ -136,8 +136,8 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniRead(
     let dst = env.get_direct_buffer_address(dst).unwrap();
     match file.read(dst) {
         Ok(read) => read as i64,
-        Err(ref err) => {
-            throw(&env, err);
+        Err(err) => {
+            throw(&env, Error::from(err));
             0
         }
     }
@@ -155,7 +155,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniReadAll<'a>(
     // get file content length
     let content_len = match file.metadata() {
         Ok(md) => md.content_len(),
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             return JByteBuffer::from(ret);
@@ -165,15 +165,19 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniReadAll<'a>(
     // get current position of file
     let curr_pos = match file.seek(SeekFrom::Current(0)) {
         Ok(pos) => pos as usize,
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
-            throw(&env, err);
+            throw(&env, Error::from(err));
             return JByteBuffer::from(ret);
         }
     };
 
     // calculate direct buffer length needed
-    let len = if content_len > curr_pos { content_len - curr_pos } else { 0 };
+    let len = if content_len > curr_pos {
+        content_len - curr_pos
+    } else {
+        0
+    };
 
     // allocate a direct byte buffer on Java side, this is to let JVM to handle
     // buffer release
@@ -200,9 +204,9 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniReadAll<'a>(
                 }
                 offset += read;
             }
-            Err(ref err) => {
+            Err(err) => {
                 let ret = JObject::null();
-                throw(&env, err);
+                throw(&env, Error::from(err));
                 return JByteBuffer::from(ret);
             }
         }
@@ -232,8 +236,8 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniWrite(
     let buf = env.get_direct_buffer_address(buf).unwrap();
     match file.write(buf) {
         Ok(written) => written as i64,
-        Err(ref err) => {
-            throw(&env, err);
+        Err(err) => {
+            throw(&env, Error::from(err));
             0
         }
     }
@@ -252,8 +256,8 @@ pub extern "system" fn Java_io_zbox_zboxfs_File_jniSeek(
     let whence = to_seek_from(offset, whence);
     match file.seek(whence) {
         Ok(pos) => pos as i64,
-        Err(ref err) => {
-            throw(&env, err);
+        Err(err) => {
+            throw(&env, Error::from(err));
             0
         }
     }

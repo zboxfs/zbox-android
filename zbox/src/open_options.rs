@@ -124,7 +124,7 @@ pub extern "system" fn Java_io_zbox_zboxfs_OpenOptions_jniOpen<'a>(
             env.set_rust_field(file_obj, RUST_OBJ_FIELD, file).unwrap();
             file_obj
         }
-        Err(ref err) => {
+        Err(err) => {
             let ret = JObject::null();
             throw(&env, err);
             ret
