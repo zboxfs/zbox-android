@@ -53,7 +53,6 @@ class HttpTransport {
 
             // send request and get response status code
             ret.status = conn.getResponseCode();
-
             // only process body when request succeed
             if (ret.status == HttpURLConnection.HTTP_OK) {
                 byte[] buf = transBuf;

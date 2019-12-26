@@ -11,7 +11,7 @@ details about [ZboxFS].
 Add below dependency snippet to your mudule's gradle file:
 
 ```gradle
-implementation 'io.zbox:zboxfs:0.1.1'
+implementation 'io.zbox:zboxfs:0.2.0'
 ```
 
 # Documentation

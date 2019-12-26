@@ -523,7 +523,7 @@ public class File extends RustObject {
         int read;
 
         try {
-            while((read = stream.read(buf)) > 0){
+            while((read = stream.read(buf)) > 0) {
                 this.write(buf, 0, read);
             }
         } catch (IOException err) {
