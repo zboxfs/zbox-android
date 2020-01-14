@@ -3,12 +3,12 @@
 This package is Android binding for [ZboxFS].
 
 ZboxFS is a zero-details, privacy-focused in-app file system. Its goal is
-to help application store files securely, privately and reliably. Check more
+to help application store files securely, privately and reliably. Check out more
 details about [ZboxFS].
 
 # How to Use
 
-Add below dependency snippet to your mudule's gradle file:
+Add below dependency snippet to your module's gradle file:
 
 ```gradle
 implementation 'io.zbox:zboxfs:0.2.0'
@@ -20,7 +20,8 @@ Check the Java doc [reference documentation](https://docs.zbox.io/android).
 
 # Sample Android App
 
-[Treno] is a sample Android app using ZboxFS.
+[Treno] is a sample Android app using this package. It shows how to use [ZboxFS]
+to build a Content Provider and save app data securely and privately.
 
 # How to Build
 

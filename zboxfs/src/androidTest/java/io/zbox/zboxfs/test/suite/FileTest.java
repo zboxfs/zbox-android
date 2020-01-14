@@ -6,9 +6,11 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import io.zbox.zboxfs.File;
+import io.zbox.zboxfs.FileInputStream;
 import io.zbox.zboxfs.Metadata;
 import io.zbox.zboxfs.OpenOptions;
 import io.zbox.zboxfs.Path;
@@ -234,8 +236,31 @@ public class FileTest {
     }
 
     @Test
-    public void outputStreamRead() throws ZboxException {
+    public void FileInputStreamRead() throws ZboxException {
         Path path = new Path("/file07");
+        File file = new OpenOptions().create(true).open(this.repo, path);
+        file.writeOnce(this.buf);
+        file.close();
+
+        byte[] dst = new byte[this.buf.position()];
+        try (FileInputStream input = repo.openFileInputStream(path)) {
+            int read = input.read(dst);
+            assertEquals(read, dst.length);
+
+            // verify read content
+            byte[] bytes = new byte[this.buf.position()];
+            ByteBuffer buf = this.buf.asReadOnlyBuffer();
+            buf.flip();
+            buf.get(bytes,0, read);
+            assertArrayEquals(dst, bytes);
+        } catch (IOException err) {
+            throw new ZboxException(err.toString());
+        }
+    }
+
+    @Test
+    public void outputStreamRead() throws ZboxException {
+        Path path = new Path("/file08");
         File file = new OpenOptions().create(true).open(this.repo, path);
         file.writeOnce(this.buf);
         file.close();
@@ -261,7 +286,7 @@ public class FileTest {
 
     @Test
     public void byteArrayWrite() throws ZboxException {
-        Path path = new Path("/file08");
+        Path path = new Path("/file09");
         File file = new OpenOptions().create(true).open(this.repo, path);
 
         // write to file with whole byte array
@@ -300,7 +325,7 @@ public class FileTest {
 
     @Test
     public void inputStreamWrite() throws ZboxException {
-        Path path = new Path("/file09");
+        Path path = new Path("/file10");
         File file = new OpenOptions().create(true).open(this.repo, path);
 
         // make input stream
@@ -327,7 +352,7 @@ public class FileTest {
 
     @Test
     public void stringWrite() throws ZboxException {
-        Path path = new Path("/file10");
+        Path path = new Path("/file11");
         File file = new OpenOptions().create(true).open(this.repo, path);
 
         String str = "some text";
@@ -344,7 +369,7 @@ public class FileTest {
 
     @Test
     public void metadata() throws ZboxException {
-        Path path = new Path("/file11");
+        Path path = new Path("/file12");
         File file = new OpenOptions().create(true).open(this.repo, path);
         file.writeOnce(this.buf);
         file.close();
@@ -363,7 +388,7 @@ public class FileTest {
 
     @Test
     public void versioning() throws ZboxException {
-        Path path = new Path("/file12");
+        Path path = new Path("/file13");
         File file = new OpenOptions().create(true).versionLimit(2).open(this.repo, path);
 
         // write version #1
@@ -447,7 +472,7 @@ public class FileTest {
 
     @Test
     public void setNewLen() throws ZboxException {
-        Path path = new Path("/file13");
+        Path path = new Path("/file14");
         File file = new OpenOptions().create(true).open(this.repo, path);
         file.writeOnce(this.buf);
         file.close();
@@ -487,7 +512,7 @@ public class FileTest {
 
     @Test
     public void exampleCodeInDoc() throws ZboxException {
-        Path path = new Path("/file14");
+        Path path = new Path("/file15");
         byte[] buf = {1, 2, 3, 4, 5, 6};
         byte[] buf2 = {7, 8};
 
@@ -516,7 +541,7 @@ public class FileTest {
 
     @Test
     public void exampleCodeInDoc2() throws ZboxException {
-        Path path = new Path("/file15");
+        Path path = new Path("/file16");
 
         // create a file and write 2 versions
         File file = new OpenOptions().create(true).versionLimit(4).open(repo, path);

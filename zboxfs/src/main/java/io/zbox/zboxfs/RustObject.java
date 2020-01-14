@@ -23,6 +23,12 @@ abstract class RustObject implements AutoCloseable {
         }
     }
 
+    /**
+     * Check if this instance has been closed.
+     *
+     * @return {@code true} if this instance is closed, otherwise {@code false}
+     * @see #close()
+     */
     public boolean isClosed() {
         return rustObj == 0;
     }
